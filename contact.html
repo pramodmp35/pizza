@@ -1,0 +1,2508 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Contact — STACKLY</title>
+    <meta
+      name="description"
+      content="Get in touch with STACKLY Pizza — visit us in Chennai, call, or drop us a message. Fresh slices, always."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800;12..96,900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap & Tailwind -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              tomato: "#D62828",
+              ember: "#FFC300",
+              ink: "#0D0D0D",
+              paper: "#FFFDF7",
+            },
+            fontFamily: {
+              display: ['"Bricolage Grotesque"', "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <style>
+      /* ============================================
+       BASE / TOKENS
+       ============================================ */
+      :root {
+        --nav-height: 80px;
+        --tomato: #d62828;
+        --tomato-dark: #8b1a1e;
+        --ember: #ffc300;
+        --ember-dark: #b8770d;
+        --ink: #0d0d0d;
+        --paper: #fffdf7;
+        --cream: #fff8ec;
+        --border: #e8dcc5;
+        --error: #c5172e;
+        --success: #1e8e3e;
+        --footer-bg: #080808;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        margin: 0;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        background: var(--ink);
+        color: #fff;
+        padding: 12px 20px;
+        z-index: 999;
+        border-radius: 0 0 8px 0;
+      }
+      .skip-link:focus {
+        left: 0;
+      }
+
+      /* ============================================
+       NAVBAR STYLES
+       ============================================ */
+      .site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        z-index: 1000;
+        background: transparent;
+        transition:
+          background 0.3s ease,
+          box-shadow 0.3s ease,
+          border-bottom 0.3s ease;
+      }
+      .site-header.is-scrolled {
+        background: rgba(13, 13, 13, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .nav-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 100%;
+        padding: 0 16px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+      .brand-logo {
+        display: block;
+        text-decoration: none;
+        z-index: 1001;
+      }
+      .logo-img {
+        height: 40px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 120px;
+      }
+      @media (min-width: 992px) {
+        .logo-img {
+          height: 48px;
+        }
+      }
+
+      .desktop-nav {
+        display: none;
+      }
+      @media (min-width: 992px) {
+        .desktop-nav {
+          display: block;
+        }
+      }
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .nav-link {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        position: relative;
+        padding: 8px 0;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--ember);
+      }
+      .nav-link.active::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--ember);
+      }
+
+      .desktop-actions {
+        display: none;
+      }
+      @media (min-width: 992px) {
+        .desktop-actions {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+        }
+      }
+      .nav-phone {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #fff;
+        text-decoration: none;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        transition: color 0.2s;
+      }
+      .nav-phone:hover {
+        color: var(--ember);
+      }
+      .icon-sm {
+        width: 16px;
+        height: 16px;
+        color: var(--ember);
+      }
+
+      .nav-order-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 24px;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 45%,
+          #a81a1a 100%
+        );
+        border-radius: 50px;
+        text-decoration: none;
+        box-shadow:
+          0 4px 0 var(--tomato-dark),
+          0 8px 16px rgba(214, 40, 40, 0.3);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+      }
+      .nav-order-btn:hover {
+        transform: translateY(-2px);
+        color: #fff;
+        box-shadow:
+          0 6px 0 var(--tomato-dark),
+          0 12px 20px rgba(214, 40, 40, 0.5);
+      }
+      .nav-order-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 var(--tomato-dark);
+      }
+
+      /* Mobile Toggle */
+      .mobile-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 1001;
+        padding: 0;
+      }
+      @media (min-width: 992px) {
+        .mobile-toggle {
+          display: none;
+        }
+      }
+      .mobile-toggle span {
+        display: block;
+        width: 100%;
+        height: 2px;
+        background-color: #fff;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      /* Mobile Menu */
+      .mobile-menu {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: #0a0a0a;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px);
+        transition:
+          opacity 0.4s ease,
+          visibility 0.4s ease,
+          transform 0.4s ease;
+        overflow-y: auto;
+      }
+      .mobile-menu.is-open {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--nav-height);
+        margin-bottom: 20px;
+      }
+      .mobile-close {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .mobile-close:hover {
+        background: var(--tomato);
+        border-color: var(--tomato);
+      }
+      .mobile-close svg {
+        width: 24px;
+        height: 24px;
+      }
+      .mobile-nav {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .mobile-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+      .mobile-link {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 26px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #fff;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .mobile-link:hover,
+      .mobile-link.active {
+        color: var(--ember);
+      }
+      .mobile-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 40px;
+        margin-top: auto;
+      }
+
+      /* ============================================
+       HERO (Updated Padding for Navbar)
+       ============================================ */
+      .contact-hero {
+        position: relative;
+        min-height: 280px;
+        background: radial-gradient(
+          ellipse at center,
+          #1a1a1a 0%,
+          #0d0d0d 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 16px 56px; /* Adjusted top padding */
+        overflow: hidden;
+        isolation: isolate;
+        border-bottom: 5px solid var(--ember);
+      }
+      .contact-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(214, 40, 40, 0.32) 0%,
+          transparent 60%
+        );
+        z-index: 1;
+        pointer-events: none;
+      }
+      .contact-hero::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 7px;
+        background: conic-gradient(
+          #d62828 90deg,
+          #fffdf7 90deg 180deg,
+          #d62828 180deg 270deg,
+          #fffdf7 270deg
+        );
+        background-size: 14px 14px;
+        z-index: 5;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+      }
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--tomato);
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        padding: 7px 14px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 12px rgba(214, 40, 40, 0.45);
+      }
+      .hero-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(30px, 9vw, 80px);
+        line-height: 0.94;
+        letter-spacing: -0.03em;
+        color: var(--ember);
+        margin: 0 0 12px;
+        text-shadow:
+          0 3px 0 var(--tomato),
+          0 6px 18px rgba(0, 0, 0, 0.5);
+      }
+      .hero-subtitle {
+        color: rgba(255, 253, 247, 0.82);
+        font-size: clamp(13.5px, 3.6vw, 17px);
+        line-height: 1.55;
+        max-width: 36ch;
+        margin: 0 auto;
+        padding: 0 4px;
+      }
+      .hero-pizza {
+        position: absolute;
+        top: 50%;
+        width: 130px;
+        height: 130px;
+        pointer-events: none;
+        z-index: 2;
+        filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.5));
+        opacity: 0.35;
+      }
+      .hero-pizza--left {
+        left: 0;
+        transform: translate(-52%, -50%);
+      }
+      .hero-pizza--right {
+        right: 0;
+        transform: translate(52%, -50%);
+      }
+      .hero-pizza svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      @media (min-width: 420px) {
+        .hero-pizza {
+          width: 170px;
+          height: 170px;
+          opacity: 0.55;
+        }
+      }
+      @media (min-width: 768px) {
+        .contact-hero {
+          min-height: 380px;
+          padding: 140px 40px 96px;
+        }
+        .hero-pizza {
+          width: 300px;
+          height: 300px;
+          opacity: 0.95;
+        }
+      }
+      @media (min-width: 1024px) {
+        .contact-hero {
+          min-height: 440px;
+        }
+        .hero-pizza {
+          width: 400px;
+          height: 400px;
+        }
+      }
+
+      /* ============================================
+       SECTIONS
+       ============================================ */
+      .section-head {
+        text-align: center;
+        margin-bottom: 28px;
+      }
+      @media (min-width: 768px) {
+        .section-head {
+          margin-bottom: 44px;
+        }
+      }
+      .section-eyebrow {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--tomato);
+        margin-bottom: 8px;
+      }
+      .section-eyebrow::before {
+        content: "🍕";
+        margin-right: 6px;
+        font-size: 12px;
+      }
+      .section-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: clamp(24px, 6.5vw, 44px);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin: 0;
+      }
+
+      /* Contact Section */
+      .contact-section {
+        padding: 48px 16px 56px;
+        background: var(--paper);
+        position: relative;
+        overflow: hidden;
+      }
+      .contact-section::before,
+      .contact-section::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .contact-section::before {
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 195, 0, 0.16),
+          transparent 70%
+        );
+        top: -100px;
+        left: -140px;
+      }
+      .contact-section::after {
+        width: 360px;
+        height: 360px;
+        background: radial-gradient(
+          circle,
+          rgba(214, 40, 40, 0.12),
+          transparent 70%
+        );
+        bottom: -140px;
+        right: -160px;
+      }
+      .contact-section > .container {
+        position: relative;
+        z-index: 1;
+      }
+      @media (min-width: 768px) {
+        .contact-section {
+          padding: 64px 20px 80px;
+        }
+      }
+
+      /* Info Cards */
+      .info-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+      }
+      @media (min-width: 992px) {
+        .info-stack {
+          justify-content: center;
+          gap: 12px;
+        }
+      }
+      .info-card {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow:
+          0 4px 14px rgba(0, 0, 0, 0.06),
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      @media (hover: hover) {
+        .info-card:hover {
+          transform: translateY(-3px);
+          box-shadow:
+            0 10px 24px rgba(0, 0, 0, 0.1),
+            0 2px 6px rgba(0, 0, 0, 0.06),
+            inset 0 1px 0 rgba(255, 255, 255, 1);
+        }
+      }
+      @media (min-width: 768px) {
+        .info-card {
+          padding: 16px;
+          gap: 14px;
+        }
+      }
+      .info-icon {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #e63946, #b81c1c);
+        color: #fff;
+        box-shadow:
+          0 4px 8px rgba(214, 40, 40, 0.35),
+          inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+          inset 0 2px 3px rgba(255, 255, 255, 0.35);
+      }
+      .info-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+      @media (min-width: 768px) {
+        .info-icon {
+          width: 48px;
+          height: 48px;
+        }
+        .info-icon svg {
+          width: 22px;
+          height: 22px;
+        }
+      }
+      .info-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #9c8b75;
+        margin-bottom: 3px;
+      }
+      .info-value {
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--ink);
+        font-weight: 500;
+        word-break: break-word;
+      }
+      .info-value a {
+        color: var(--ink);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .info-value a:hover {
+        color: var(--tomato);
+      }
+      @media (min-width: 768px) {
+        .info-value {
+          font-size: 15px;
+        }
+      }
+
+      .socials {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .social-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #2a2a2a, #0d0d0d);
+        color: var(--ember);
+        box-shadow:
+          0 4px 10px rgba(0, 0, 0, 0.25),
+          inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+          inset 0 2px 3px rgba(255, 255, 255, 0.08);
+        transition:
+          transform 0.2s,
+          background 0.2s;
+        text-decoration: none;
+      }
+      .social-btn:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(145deg, var(--tomato), #a81a1a);
+        color: #fff;
+      }
+      .social-btn:active {
+        transform: translateY(0);
+      }
+      .social-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* Form Card */
+      .form-card {
+        position: relative;
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 20px;
+        padding: 22px 16px;
+        box-shadow:
+          0 20px 40px rgba(0, 0, 0, 0.09),
+          0 5px 14px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+      }
+      @media (min-width: 768px) {
+        .form-card {
+          padding: 32px 28px;
+          border-radius: 24px;
+        }
+      }
+      .form-card-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 21px;
+        color: var(--ink);
+        margin: 0 0 4px;
+        letter-spacing: -0.01em;
+      }
+      .form-card-sub {
+        font-size: 13.5px;
+        color: #7a6a55;
+        margin: 0 0 20px;
+        line-height: 1.5;
+      }
+      @media (min-width: 768px) {
+        .form-card-title {
+          font-size: 24px;
+        }
+        .form-card-sub {
+          font-size: 14px;
+          margin-bottom: 24px;
+        }
+      }
+
+      .form-field {
+        margin-bottom: 4px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #5c4f3e;
+        margin-bottom: 6px;
+      }
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 13px 14px;
+        background: var(--paper);
+        border: 2px solid var(--border);
+        border-radius: 11px;
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        line-height: 1.4;
+        color: var(--ink);
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          background 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .form-select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C4F3E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 38px;
+      }
+      .form-textarea {
+        resize: vertical;
+        min-height: 110px;
+      }
+      .form-input::placeholder,
+      .form-textarea::placeholder {
+        color: #a89a85;
+      }
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: var(--tomato);
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.06),
+          0 0 0 4px rgba(214, 40, 40, 0.14);
+      }
+
+      .form-input.is-error,
+      .form-select.is-error,
+      .form-textarea.is-error {
+        border-color: var(--error);
+        background: #fff5f5;
+        animation: shake 0.35s ease;
+      }
+      .form-input.is-error:focus,
+      .form-select.is-error:focus,
+      .form-textarea.is-error:focus {
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.06),
+          0 0 0 4px rgba(197, 23, 46, 0.15);
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-5px);
+        }
+        40% {
+          transform: translateX(5px);
+        }
+        60% {
+          transform: translateX(-3px);
+        }
+        80% {
+          transform: translateX(3px);
+        }
+      }
+
+      .field-error {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--error);
+        line-height: 1.4;
+        min-height: 16px;
+        opacity: 0;
+        transform: translateY(-3px);
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .field-error.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .btn-slice {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 15px 24px;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 45%,
+          #a81a1a 100%
+        );
+        border: none;
+        border-radius: 13px;
+        cursor: pointer;
+        box-shadow:
+          0 5px 0 var(--tomato-dark),
+          0 9px 20px rgba(214, 40, 40, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .btn-slice:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 7px 0 var(--tomato-dark),
+          0 13px 24px rgba(214, 40, 40, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      .btn-slice:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 2px 0 var(--tomato-dark),
+          0 4px 10px rgba(214, 40, 40, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      .btn-slice svg {
+        width: 16px;
+        height: 16px;
+      }
+      @media (min-width: 768px) {
+        .btn-slice {
+          font-size: 15px;
+          padding: 16px 28px;
+        }
+      }
+
+      /* Map Section */
+      .map-section {
+        padding: 16px 16px 56px;
+        background: var(--paper);
+      }
+      @media (min-width: 768px) {
+        .map-section {
+          padding: 20px 20px 80px;
+        }
+      }
+      .map-frame {
+        position: relative;
+        padding: 9px;
+        background: var(--ink);
+        border-radius: 20px;
+        box-shadow:
+          0 0 0 3px var(--ember),
+          0 0 0 6px var(--ink),
+          0 20px 44px rgba(0, 0, 0, 0.22),
+          inset 0 2px 0 rgba(255, 255, 255, 0.1);
+      }
+      .map-frame::before {
+        content: "";
+        position: absolute;
+        inset: 6px;
+        border-radius: 14px;
+        border: 1px dashed rgba(255, 195, 0, 0.25);
+        pointer-events: none;
+      }
+      .map-frame iframe {
+        display: block;
+        width: 100%;
+        height: 260px;
+        border-radius: 14px;
+        border: 0;
+        filter: contrast(1.02) saturate(1.05);
+      }
+      @media (min-width: 480px) {
+        .map-frame iframe {
+          height: 320px;
+        }
+      }
+      @media (min-width: 768px) {
+        .map-frame {
+          padding: 12px;
+          border-radius: 26px;
+          box-shadow:
+            0 0 0 4px var(--ember),
+            0 0 0 8px var(--ink),
+            0 28px 56px rgba(0, 0, 0, 0.22),
+            inset 0 2px 0 rgba(255, 255, 255, 0.1);
+        }
+        .map-frame::before {
+          inset: 8px;
+          border-radius: 18px;
+        }
+        .map-frame iframe {
+          height: 440px;
+          border-radius: 18px;
+        }
+      }
+
+      /* CTA Banner */
+      .cta-section {
+        padding: 16px 16px 56px;
+        background: var(--paper);
+      }
+      @media (min-width: 768px) {
+        .cta-section {
+          padding: 20px 20px 80px;
+        }
+      }
+      .cta-banner {
+        position: relative;
+        background:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(255, 195, 0, 0.18),
+            transparent 55%
+          ),
+          linear-gradient(135deg, #d62828 0%, #a81a1a 100%);
+        border-radius: 20px;
+        padding: 38px 20px 34px;
+        color: #fff;
+        text-align: center;
+        overflow: hidden;
+        box-shadow:
+          0 20px 40px rgba(214, 40, 40, 0.32),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+      }
+      .cta-banner::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 9px;
+        background: conic-gradient(
+          #ffc300 90deg,
+          #fffdf7 90deg 180deg,
+          #ffc300 180deg 270deg,
+          #fffdf7 270deg
+        );
+        background-size: 18px 18px;
+      }
+      .cta-banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          radial-gradient(circle, rgba(255, 195, 0, 0.16) 12%, transparent 13%),
+          radial-gradient(circle, rgba(0, 0, 0, 0.1) 8%, transparent 9%);
+        background-size:
+          70px 70px,
+          110px 110px;
+        background-position:
+          0 0,
+          35px 55px;
+        pointer-events: none;
+        opacity: 0.7;
+      }
+      @media (min-width: 768px) {
+        .cta-banner {
+          padding: 48px 40px 44px;
+          border-radius: 28px;
+        }
+      }
+      .cta-content {
+        position: relative;
+        z-index: 2;
+      }
+      .cta-eyebrow {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--ember);
+        margin-bottom: 10px;
+      }
+      .cta-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(24px, 7vw, 48px);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin: 0 0 10px;
+        text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+      }
+      .cta-sub {
+        font-size: 14px;
+        color: rgba(255, 253, 247, 0.88);
+        margin: 0 auto 22px;
+        max-width: 42ch;
+        line-height: 1.55;
+        padding: 0 4px;
+      }
+      @media (min-width: 768px) {
+        .cta-sub {
+          font-size: 15px;
+          margin-bottom: 26px;
+        }
+      }
+      .btn-yellow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 30px;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink);
+        background: linear-gradient(
+          180deg,
+          #ffd54f 0%,
+          #ffc300 45%,
+          #e5a800 100%
+        );
+        border: none;
+        border-radius: 13px;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow:
+          0 5px 0 var(--ember-dark),
+          0 9px 20px rgba(255, 195, 0, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .btn-yellow:hover {
+        transform: translateY(-2px);
+        color: var(--ink);
+        box-shadow:
+          0 7px 0 var(--ember-dark),
+          0 13px 24px rgba(255, 195, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      }
+      .btn-yellow:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 2px 0 var(--ember-dark),
+          0 4px 10px rgba(255, 195, 0, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+      @media (min-width: 768px) {
+        .btn-yellow {
+          font-size: 15px;
+          padding: 16px 34px;
+        }
+      }
+
+      /* ============================================
+       FOOTER STYLES
+       ============================================ */
+      .site-footer {
+        position: relative;
+        background-color: var(--footer-bg);
+        color: #fff;
+        padding: 60px 16px 0;
+        overflow: hidden;
+        border-top: 6px solid transparent;
+        border-image: repeating-linear-gradient(
+            45deg,
+            var(--tomato) 0,
+            var(--tomato) 10px,
+            var(--paper) 10px,
+            var(--paper) 20px
+          )
+          6;
+      }
+      .site-footer::before {
+        content: "";
+        position: absolute;
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(214, 40, 40, 0.15) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+      .footer-container {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+        margin-bottom: 50px;
+      }
+      @media (min-width: 576px) {
+        .footer-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 992px) {
+        .footer-grid {
+          grid-template-columns: 2fr 1fr 1fr 1.5fr;
+          gap: 30px;
+        }
+      }
+
+      .footer-brand {
+        text-align: center;
+      }
+      @media (min-width: 992px) {
+        .footer-brand {
+          text-align: left;
+        }
+      }
+      .footer-logo {
+        display: inline-block;
+        margin-bottom: 20px;
+      }
+      .footer-logo img {
+        height: 48px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 140px;
+      }
+      .footer-desc {
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 24px;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      @media (min-width: 992px) {
+        .footer-desc {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+
+      .footer-socials {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+      @media (min-width: 992px) {
+        .footer-socials {
+          justify-content: flex-start;
+        }
+      }
+      .social-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #2a2a2a, #0d0d0d);
+        color: var(--ember);
+        box-shadow:
+          0 4px 10px rgba(0, 0, 0, 0.25),
+          inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+          inset 0 2px 3px rgba(255, 255, 255, 0.08);
+        transition:
+          transform 0.2s,
+          background 0.2s;
+        text-decoration: none;
+      }
+      .social-btn:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(145deg, var(--tomato), #a81a1a);
+        color: #fff;
+      }
+      .social-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .footer-heading {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        color: #fff;
+        margin: 0 0 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: center;
+      }
+      @media (min-width: 992px) {
+        .footer-heading {
+          text-align: left;
+        }
+      }
+      .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      @media (min-width: 992px) {
+        .footer-links {
+          text-align: left;
+        }
+      }
+      .footer-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition:
+          color 0.2s,
+          padding-left 0.2s;
+        display: inline-block;
+      }
+      .footer-link:hover {
+        color: var(--ember);
+      }
+
+      .footer-contact-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: center;
+      }
+      @media (min-width: 992px) {
+        .footer-contact-list {
+          align-items: flex-start;
+        }
+      }
+      .footer-contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        line-height: 1.5;
+        text-align: left;
+      }
+      .footer-contact-item a {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .footer-contact-item a:hover {
+        color: var(--ember);
+      }
+      .contact-icon {
+        color: var(--ember);
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+      }
+
+      .footer-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+      }
+      @media (min-width: 768px) {
+        .footer-bottom {
+          flex-direction: row;
+          justify-content: space-between;
+          text-align: left;
+        }
+      }
+      .copyright {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        margin: 0;
+      }
+      .footer-bottom-links {
+        display: flex;
+        gap: 20px;
+      }
+      .footer-bottom-link {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .footer-bottom-link:hover {
+        color: #fff;
+      }
+
+      /* Scroll to Top */
+      .scroll-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(
+          180deg,
+          #ffd54f 0%,
+          #ffc300 45%,
+          #e5a800 100%
+        );
+        color: var(--ink);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 99;
+        box-shadow:
+          0 4px 0 var(--ember-dark),
+          0 8px 16px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.2s,
+          opacity 0.3s,
+          visibility 0.3s;
+        opacity: 0;
+        visibility: hidden;
+      }
+      .scroll-top.is-visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .scroll-top:hover {
+        transform: translateY(-3px);
+      }
+      .scroll-top:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 var(--ember-dark);
+      }
+      .scroll-top svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <!-- ============================================
+       NAVBAR
+       ============================================ -->
+    <header class="site-header" id="siteHeader">
+      <div class="nav-container">
+        <a href="./index.html" class="brand-logo" aria-label="STACKLY Home">
+          <img src="./assets/logo.webp" alt="STACKLY Logo" class="logo-img" />
+        </a>
+        <nav class="desktop-nav" aria-label="Main Navigation">
+          <ul class="nav-links">
+            <li><a href="./index.html" class="nav-link">Home</a></li>
+            <li><a href="./about.html" class="nav-link">About Us</a></li>
+            <li><a href="./menu.html" class="nav-link">Menu</a></li>
+            <li><a href="./blog.html" class="nav-link">Blog</a></li>
+            <li>
+              <a href="./contact.html" class="nav-link active">Contact Us</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="desktop-actions">
+          <a href="./404.html" class="nav-phone">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon-sm"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            +91 44 1234 5678
+          </a>
+          <a href="./404.html" class="nav-order-btn">Order Online</a>
+        </div>
+        <button
+          class="mobile-toggle"
+          id="mobileToggle"
+          aria-label="Open Menu"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ============================================
+       MOBILE FULL-SCREEN MENU
+       ============================================ -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-header">
+        <a href="./index.html" class="brand-logo">
+          <img src="./assets/logo.webp" alt="STACKLY Logo" class="logo-img" />
+        </a>
+        <button class="mobile-close" id="mobileClose" aria-label="Close Menu">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <ul class="mobile-links">
+          <li><a href="./index.html" class="mobile-link">Home</a></li>
+          <li><a href="./about.html" class="mobile-link">About Us</a></li>
+          <li><a href="./menu.html" class="mobile-link">Menu</a></li>
+          <li><a href="./blog.html" class="mobile-link">Blog</a></li>
+          <li>
+            <a href="./contact.html" class="mobile-link active">Contact Us</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="mobile-actions">
+        <a
+          href="./404.html"
+          class="nav-phone"
+          style="justify-content: center; margin-bottom: 20px"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon-sm"
+          >
+            <path
+              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"
+            />
+          </svg>
+          +91 44 1234 5678
+        </a>
+        <a href="./404.html" class="nav-order-btn" style="width: 100%"
+          >Order Online</a
+        >
+      </div>
+    </div>
+
+    <main id="main">
+      <!-- ============================================
+         HERO
+         ============================================ -->
+      <section class="contact-hero" aria-labelledby="hero-title">
+        <div
+          class="hero-pizza hero-pizza--left"
+          aria-hidden="true"
+          data-gsap="pizza-left"
+        >
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="99" fill="#B8770D" />
+            <circle cx="100" cy="100" r="94" fill="#D69120" />
+            <circle cx="100" cy="100" r="80" fill="#A81A1A" />
+            <circle cx="100" cy="100" r="76" fill="#FFC300" />
+            <circle cx="70" cy="60" r="6" fill="#FFD54F" opacity="0.8" />
+            <circle cx="130" cy="70" r="5" fill="#FFD54F" opacity="0.8" />
+            <circle cx="60" cy="130" r="7" fill="#FFD54F" opacity="0.8" />
+            <circle cx="140" cy="140" r="5" fill="#FFD54F" opacity="0.8" />
+            <circle cx="105" cy="100" r="6" fill="#FFD54F" opacity="0.8" />
+            <circle cx="75" cy="75" r="14" fill="#8B1A1E" />
+            <circle cx="75" cy="75" r="12" fill="#D62828" />
+            <circle cx="75" cy="75" r="3" fill="#8B1A1E" />
+            <circle cx="130" cy="85" r="14" fill="#8B1A1E" />
+            <circle cx="130" cy="85" r="12" fill="#D62828" />
+            <circle cx="130" cy="85" r="3" fill="#8B1A1E" />
+            <circle cx="85" cy="135" r="14" fill="#8B1A1E" />
+            <circle cx="85" cy="135" r="12" fill="#D62828" />
+            <circle cx="85" cy="135" r="3" fill="#8B1A1E" />
+            <circle cx="140" cy="140" r="14" fill="#8B1A1E" />
+            <circle cx="140" cy="140" r="12" fill="#D62828" />
+            <circle cx="140" cy="140" r="3" fill="#8B1A1E" />
+            <circle cx="100" cy="60" r="7" fill="#0D0D0D" />
+            <circle cx="100" cy="60" r="3" fill="#333" />
+            <circle cx="60" cy="105" r="7" fill="#0D0D0D" />
+            <circle cx="60" cy="105" r="3" fill="#333" />
+            <circle cx="140" cy="105" r="7" fill="#0D0D0D" />
+            <circle cx="140" cy="105" r="3" fill="#333" />
+            <circle cx="105" cy="150" r="7" fill="#0D0D0D" />
+            <circle cx="105" cy="150" r="3" fill="#333" />
+          </svg>
+        </div>
+
+        <div class="hero-content">
+          <span class="hero-eyebrow" data-gsap="hero-eyebrow"
+            >SAY HELLO 👋</span
+          >
+          <h1 class="hero-title" id="hero-title" data-gsap="hero-title">
+            GET IN TOUCH
+          </h1>
+          <p class="hero-subtitle" data-gsap="hero-subtitle">
+            Craving a slice? Got a question? We're one message away.
+          </p>
+        </div>
+
+        <div
+          class="hero-pizza hero-pizza--right"
+          aria-hidden="true"
+          data-gsap="pizza-right"
+        >
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="99" fill="#B8770D" />
+            <circle cx="100" cy="100" r="94" fill="#D69120" />
+            <circle cx="100" cy="100" r="80" fill="#A81A1A" />
+            <circle cx="100" cy="100" r="76" fill="#FFC300" />
+            <circle cx="65" cy="55" r="6" fill="#FFD54F" opacity="0.8" />
+            <circle cx="140" cy="65" r="5" fill="#FFD54F" opacity="0.8" />
+            <circle cx="55" cy="120" r="7" fill="#FFD54F" opacity="0.8" />
+            <circle cx="135" cy="130" r="5" fill="#FFD54F" opacity="0.8" />
+            <circle cx="100" cy="95" r="6" fill="#FFD54F" opacity="0.8" />
+            <circle cx="85" cy="70" r="14" fill="#8B1A1E" />
+            <circle cx="85" cy="70" r="12" fill="#D62828" />
+            <circle cx="85" cy="70" r="3" fill="#8B1A1E" />
+            <circle cx="135" cy="95" r="14" fill="#8B1A1E" />
+            <circle cx="135" cy="95" r="12" fill="#D62828" />
+            <circle cx="135" cy="95" r="3" fill="#8B1A1E" />
+            <circle cx="75" cy="130" r="14" fill="#8B1A1E" />
+            <circle cx="75" cy="130" r="12" fill="#D62828" />
+            <circle cx="75" cy="130" r="3" fill="#8B1A1E" />
+            <circle cx="130" cy="145" r="14" fill="#8B1A1E" />
+            <circle cx="130" cy="145" r="12" fill="#D62828" />
+            <circle cx="130" cy="145" r="3" fill="#8B1A1E" />
+            <circle cx="110" cy="55" r="7" fill="#0D0D0D" />
+            <circle cx="110" cy="55" r="3" fill="#333" />
+            <circle cx="55" cy="90" r="7" fill="#0D0D0D" />
+            <circle cx="55" cy="90" r="3" fill="#333" />
+            <circle cx="145" cy="115" r="7" fill="#0D0D0D" />
+            <circle cx="145" cy="115" r="3" fill="#333" />
+            <circle cx="95" cy="155" r="7" fill="#0D0D0D" />
+            <circle cx="95" cy="155" r="3" fill="#333" />
+          </svg>
+        </div>
+      </section>
+
+      <!-- ============================================
+         CONTACT
+         ============================================ -->
+      <section class="contact-section" aria-labelledby="contact-title">
+        <div class="container">
+          <div class="section-head">
+            <span class="section-eyebrow">REACH OUT</span>
+            <h2 class="section-title" id="contact-title">Let's talk pizza.</h2>
+          </div>
+
+          <div class="row g-3 g-md-4 g-lg-5 align-items-stretch">
+            <!-- RIGHT on desktop / FIRST on mobile: Form -->
+            <div class="col-12 col-lg-7 order-1 order-lg-2">
+              <form
+                class="form-card"
+                id="contact-form"
+                action="./404.html"
+                method="GET"
+                novalidate
+              >
+                <h3 class="form-card-title">Drop us a line</h3>
+                <p class="form-card-sub">
+                  All fields are required. We'll get back to you within 24
+                  hours.
+                </p>
+
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <div class="form-field">
+                      <label for="name" class="form-label">Your Name *</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="form-input"
+                        placeholder="Jane Dough"
+                        required
+                        aria-required="true"
+                        autocomplete="name"
+                      />
+                      <span
+                        class="field-error"
+                        id="err-name"
+                        role="alert"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <div class="form-field">
+                      <label for="email" class="form-label">Email *</label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        placeholder="jane@example.com"
+                        required
+                        aria-required="true"
+                        autocomplete="email"
+                      />
+                      <span
+                        class="field-error"
+                        id="err-email"
+                        role="alert"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <div class="form-field">
+                      <label for="phone" class="form-label">Phone *</label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        class="form-input"
+                        placeholder="+91 98765 43210"
+                        required
+                        aria-required="true"
+                        autocomplete="tel"
+                      />
+                      <span
+                        class="field-error"
+                        id="err-phone"
+                        role="alert"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <div class="form-field">
+                      <label for="subject" class="form-label">Topic *</label>
+                      <select
+                        id="subject"
+                        name="subject"
+                        class="form-select"
+                        required
+                        aria-required="true"
+                      >
+                        <option value="" disabled selected>
+                          Select a topic
+                        </option>
+                        <option value="order">Place an Order</option>
+                        <option value="reservation">Table Reservation</option>
+                        <option value="feedback">Feedback</option>
+                        <option value="catering">Catering / Events</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <span
+                        class="field-error"
+                        id="err-subject"
+                        role="alert"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="form-field">
+                      <label for="message" class="form-label">Message *</label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        class="form-textarea"
+                        placeholder="Tell us what's on your mind — and your favourite topping."
+                        required
+                        aria-required="true"
+                        rows="4"
+                      ></textarea>
+                      <span
+                        class="field-error"
+                        id="err-message"
+                        role="alert"
+                      ></span>
+                    </div>
+                  </div>
+
+                  <div class="col-12 pt-2">
+                    <button type="submit" class="btn-slice">
+                      Send Message
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <line x1="22" y1="2" x2="11" y2="13" />
+                        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- LEFT on desktop / SECOND on mobile: Info -->
+            <div class="col-12 col-lg-5 order-2 order-lg-1">
+              <div class="info-stack">
+                <div class="info-card" data-aos="fade-up" data-aos-delay="0">
+                  <div class="info-icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                      />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="info-label">Visit Us</div>
+                    <div class="info-value">
+                      <a href="./404.html"
+                        >42 Marina Walk, Besant Nagar<br />Chennai, Tamil Nadu
+                        600090</a
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="info-card" data-aos="fade-up" data-aos-delay="80">
+                  <div class="info-icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="info-label">Call Us</div>
+                    <div class="info-value">
+                      <a href="./404.html">+91 44 1234 5678</a><br />
+                      <a href="./404.html">+91 98765 43210</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="info-card" data-aos="fade-up" data-aos-delay="160">
+                  <div class="info-icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="m22 6-10 7L2 6" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="info-label">Email</div>
+                    <div class="info-value">
+                      <a href="./404.html">hello@stackly.pizza</a><br />
+                      <a href="./404.html">orders@stackly.pizza</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="info-card" data-aos="fade-up" data-aos-delay="240">
+                  <div class="info-icon" aria-hidden="true">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="info-label">Opening Hours</div>
+                    <div class="info-value">
+                      Mon – Thu: 11:00 AM – 11:00 PM<br />
+                      Fri – Sun: 11:00 AM – 1:00 AM
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-2" data-aos="fade-up" data-aos-delay="300">
+                  <div class="info-label">Follow the slices</div>
+                  <div class="socials">
+                    <a
+                      href="./404.html"
+                      class="social-btn"
+                      aria-label="Instagram"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect
+                          x="2"
+                          y="2"
+                          width="20"
+                          height="20"
+                          rx="5"
+                          ry="5"
+                        />
+                        <path
+                          d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"
+                        />
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                      </svg>
+                    </a>
+                    <a
+                      href="./404.html"
+                      class="social-btn"
+                      aria-label="Facebook"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                        />
+                      </svg>
+                    </a>
+                    <a
+                      href="./404.html"
+                      class="social-btn"
+                      aria-label="X / Twitter"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M4 4l16 16M20 4L4 20" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+         MAP
+         ============================================ -->
+      <section class="map-section" aria-labelledby="map-title">
+        <div class="container">
+          <div class="section-head">
+            <span class="section-eyebrow">FIND US</span>
+            <h2 class="section-title" id="map-title">Hot from Chennai.</h2>
+          </div>
+
+          <div class="map-frame" data-aos="zoom-in">
+            <iframe
+              src="https://maps.google.com/maps?q=Besant%20Nagar%20Chennai&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="440"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="STACKLY Pizza — Chennai Location"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================
+         CTA BANNER
+         ============================================ -->
+      <section class="cta-section" aria-labelledby="cta-title">
+        <div class="container">
+          <div class="cta-banner" data-gsap="cta-banner">
+            <div class="cta-content">
+              <span class="cta-eyebrow">HUNGRY YET?</span>
+              <h2 class="cta-title" id="cta-title">Ready for a slice?</h2>
+              <p class="cta-sub">
+                Skip the chat — order straight from our kitchen. Hot, fresh, at
+                your door in 30.
+              </p>
+              <a href="./404.html" class="btn-yellow">
+                Order Now
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="width: 17px; height: 17px"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============================================
+       FOOTER
+       ============================================ -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-grid">
+          <!-- Brand Column -->
+          <div class="footer-brand">
+            <a href="./index.html" class="footer-logo">
+              <img src="./assets/logo.webp" alt="STACKLY Logo" />
+            </a>
+            <p class="footer-desc">
+              Handcrafted, wood-fired pizza bringing people together in Chennai
+              since 2018. Hot, fresh, and at your door in 30.
+            </p>
+            <div class="footer-socials">
+              <a href="./404.html" class="social-btn" aria-label="Instagram">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+              <a href="./404.html" class="social-btn" aria-label="Facebook">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                  />
+                </svg>
+              </a>
+              <a href="./404.html" class="social-btn" aria-label="X / Twitter">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 4l16 16M20 4L4 20" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div>
+            <h3 class="footer-heading">Quick Links</h3>
+            <ul class="footer-links">
+              <li><a href="./index.html" class="footer-link">Home</a></li>
+              <li><a href="./about.html" class="footer-link">About Us</a></li>
+              <li><a href="./menu.html" class="footer-link">Menu</a></li>
+              <li><a href="./blog.html" class="footer-link">Blog</a></li>
+              <li>
+                <a href="./contact.html" class="footer-link">Contact Us</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Categories -->
+          <div>
+            <h3 class="footer-heading">Explore</h3>
+            <ul class="footer-links">
+              <li>
+                <a href="./404.html" class="footer-link">Classic Pizzas</a>
+              </li>
+              <li>
+                <a href="./404.html" class="footer-link">Signature Series</a>
+              </li>
+              <li>
+                <a href="./404.html" class="footer-link">Veggie Delights</a>
+              </li>
+              <li>
+                <a href="./404.html" class="footer-link">Dessert Pizzas</a>
+              </li>
+              <li>
+                <a href="./404.html" class="footer-link">Offers & Deals</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contact Info -->
+          <div>
+            <h3 class="footer-heading">Contact Us</h3>
+            <ul class="footer-contact-list">
+              <li class="footer-contact-item">
+                <svg
+                  class="contact-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <a href="./404.html"
+                  >42 Marina Walk, Besant Nagar,<br />Chennai, TN 600090</a
+                >
+              </li>
+              <li class="footer-contact-item">
+                <svg
+                  class="contact-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"
+                  />
+                </svg>
+                <a href="./404.html">+91 44 1234 5678</a>
+              </li>
+              <li class="footer-contact-item">
+                <svg
+                  class="contact-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="m22 6-10 7L2 6" />
+                </svg>
+                <a href="./404.html">hello@stackly.pizza</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+          <p class="copyright">&copy; 2026 STACKLY. All rights reserved.</p>
+          <div class="footer-bottom-links">
+            <a href="./404.html" class="footer-bottom-link">Privacy Policy</a>
+            <a href="./404.html" class="footer-bottom-link">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15" />
+      </svg>
+    </button>
+
+    <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+      /* ============================================================
+       1. AOS
+       ============================================================ */
+      AOS.init({
+        duration: 700,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 60,
+        disable: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+
+      /* ============================================================
+       2. FORM VALIDATION
+       ============================================================ */
+      (function initFormValidation() {
+        const form = document.getElementById("contact-form");
+        let submitted = false;
+
+        const fields = {
+          name: {
+            el: document.getElementById("name"),
+            errEl: document.getElementById("err-name"),
+            validate: (v) => v.trim().length >= 2,
+            msg: "Please enter your name (at least 2 characters).",
+          },
+          email: {
+            el: document.getElementById("email"),
+            errEl: document.getElementById("err-email"),
+            validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+            msg: "Please enter a valid email address.",
+          },
+          phone: {
+            el: document.getElementById("phone"),
+            errEl: document.getElementById("err-phone"),
+            validate: (v) => {
+              const digits = v.replace(/[^\d]/g, "");
+              return (
+                digits.length >= 7 &&
+                digits.length <= 15 &&
+                /^[\d\s+\-().]+$/.test(v)
+              );
+            },
+            msg: "Please enter a valid phone number (7–15 digits).",
+          },
+          subject: {
+            el: document.getElementById("subject"),
+            errEl: document.getElementById("err-subject"),
+            validate: (v) => v !== "" && v != null,
+            msg: "Please select a topic.",
+          },
+          message: {
+            el: document.getElementById("message"),
+            errEl: document.getElementById("err-message"),
+            validate: (v) => v.trim().length >= 10,
+            msg: "Please tell us a bit more (at least 10 characters).",
+          },
+        };
+
+        function showError(field) {
+          field.el.classList.add("is-error");
+          field.el.setAttribute("aria-invalid", "true");
+          field.el.setAttribute("aria-describedby", field.errEl.id);
+          field.errEl.textContent = field.msg;
+          field.errEl.classList.add("is-visible");
+        }
+
+        function clearError(field) {
+          field.el.classList.remove("is-error");
+          field.el.removeAttribute("aria-invalid");
+          field.el.removeAttribute("aria-describedby");
+          field.errEl.textContent = "";
+          field.errEl.classList.remove("is-visible");
+        }
+
+        function validateField(field) {
+          const ok = field.validate(field.el.value);
+          if (!ok) showError(field);
+          else clearError(field);
+          return ok;
+        }
+
+        // Validate on blur & clear on input (after first attempt)
+        Object.values(fields).forEach((field) => {
+          field.el.addEventListener("blur", () => {
+            if (submitted) validateField(field);
+          });
+          field.el.addEventListener("input", () => {
+            if (submitted && field.el.classList.contains("is-error")) {
+              validateField(field);
+            }
+          });
+          field.el.addEventListener("change", () => {
+            if (submitted) validateField(field);
+          });
+        });
+
+        // Submit
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          submitted = true;
+
+          let valid = true;
+          let firstInvalid = null;
+
+          Object.values(fields).forEach((field) => {
+            if (!validateField(field)) {
+              valid = false;
+              if (!firstInvalid) firstInvalid = field.el;
+            }
+          });
+
+          if (!valid) {
+            if (firstInvalid) {
+              firstInvalid.focus({ preventScroll: false });
+              firstInvalid.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
+            return;
+          }
+
+          // ✅ Validation passed → redirect
+          window.location.href = "./404.html";
+        });
+      })();
+
+      /* ============================================================
+       3. GSAP
+       ============================================================ */
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      gsap.registerPlugin(ScrollTrigger);
+
+      if (!reduceMotion) {
+        const heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+        heroTl
+          .from('[data-gsap="hero-eyebrow"]', {
+            y: 20,
+            opacity: 0,
+            duration: 0.55,
+          })
+          .from(
+            '[data-gsap="hero-title"]',
+            { y: 40, opacity: 0, duration: 0.8 },
+            "-=0.35",
+          )
+          .from(
+            '[data-gsap="hero-subtitle"]',
+            { y: 24, opacity: 0, duration: 0.6 },
+            "-=0.5",
+          )
+          .from(
+            '[data-gsap="pizza-left"]',
+            { xPercent: -30, opacity: 0, rotate: -15, duration: 1.1 },
+            0.15,
+          )
+          .from(
+            '[data-gsap="pizza-right"]',
+            { xPercent: 30, opacity: 0, rotate: 15, duration: 1.1 },
+            0.15,
+          );
+
+        gsap.to('[data-gsap="pizza-left"]', {
+          y: -12,
+          duration: 3.6,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+        gsap.to('[data-gsap="pizza-right"]', {
+          y: 12,
+          duration: 4.2,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
+
+        gsap.from('[data-gsap="cta-banner"]', {
+          scrollTrigger: {
+            trigger: '[data-gsap="cta-banner"]',
+            start: "top 85%",
+          },
+          scale: 0.94,
+          opacity: 0,
+          y: 40,
+          duration: 0.9,
+          ease: "power3.out",
+        });
+      }
+
+      /* ============================================================
+       4. NAVBAR & FOOTER LOGIC
+       ============================================================ */
+      document.addEventListener("DOMContentLoaded", () => {
+        const header = document.getElementById("siteHeader");
+        const mobileToggle = document.getElementById("mobileToggle");
+        const mobileClose = document.getElementById("mobileClose");
+        const mobileMenu = document.getElementById("mobileMenu");
+        const scrollTopBtn = document.getElementById("scrollTopBtn");
+
+        // 1. Scroll Header Effect & Scroll Top Button
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (window.scrollY > 20) {
+              header.classList.add("is-scrolled");
+            } else {
+              header.classList.remove("is-scrolled");
+            }
+
+            if (window.scrollY > 400) {
+              scrollTopBtn.classList.add("is-visible");
+            } else {
+              scrollTopBtn.classList.remove("is-visible");
+            }
+          },
+          { passive: true },
+        );
+
+        // 2. Mobile Menu Toggle
+        function openMenu() {
+          mobileMenu.classList.add("is-open");
+          mobileToggle.setAttribute("aria-expanded", "true");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeMenu() {
+          mobileMenu.classList.remove("is-open");
+          mobileToggle.setAttribute("aria-expanded", "false");
+          document.body.style.overflow = "";
+        }
+
+        mobileToggle.addEventListener("click", openMenu);
+        mobileClose.addEventListener("click", closeMenu);
+
+        const mobileLinks = document.querySelectorAll(
+          ".mobile-link, .mobile-actions a",
+        );
+        mobileLinks.forEach((link) => {
+          link.addEventListener("click", closeMenu);
+        });
+
+        // 3. Scroll to Top Click
+        scrollTopBtn.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    </script>
+  </body>
+</html>

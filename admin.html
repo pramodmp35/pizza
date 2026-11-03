@@ -1,0 +1,2067 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Admin Dashboard — STACKLY</title>
+    <meta
+      name="description"
+      content="STACKLY Admin Dashboard — manage orders, menu, and customers."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800;12..96,900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap & Tailwind -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              tomato: "#D62828",
+              ember: "#FFC300",
+              ink: "#0D0D0D",
+              paper: "#FFFDF7",
+            },
+            fontFamily: {
+              display: ['"Bricolage Grotesque"', "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <style>
+      /* ============================================
+       BASE / TOKENS
+       ============================================ */
+      :root {
+        --tomato: #d62828;
+        --tomato-dark: #8b1a1e;
+        --ember: #ffc300;
+        --ember-dark: #b8770d;
+        --ink: #0d0d0d;
+        --paper: #fffdf7;
+        --cream: #fff8ec;
+        --border: #e8dcc5;
+        --footer-bg: #080808;
+        --sidebar-width: 260px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f7f3eb;
+        color: var(--ink);
+        margin: 0;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ============================================
+       LAYOUT
+       ============================================ */
+      .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: var(--ink);
+        color: #fff;
+        z-index: 1040;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      }
+      .sidebar.is-open {
+        transform: translateX(0);
+      }
+      @media (min-width: 992px) {
+        .sidebar {
+          transform: translateX(0);
+        }
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        width: 100%;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 992px) {
+        .main-content {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile Top Bar */
+      .mobile-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: var(--ink);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      @media (min-width: 992px) {
+        .mobile-topbar {
+          display: none;
+        }
+      }
+      .mobile-logo-wrap {
+        display: inline-block;
+        text-decoration: none;
+      }
+      .mobile-logo {
+        height: 32px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 90px;
+      }
+      .hamburger-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .hamburger-btn:hover {
+        background: var(--tomato);
+      }
+      .hamburger-btn svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Backdrop */
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1035;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+      }
+      .sidebar-backdrop.is-visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      @media (min-width: 992px) {
+        .sidebar-backdrop {
+          display: none;
+        }
+      }
+
+      /* ============================================
+       SIDEBAR CONTENT
+       ============================================ */
+      .sidebar-header {
+        padding: 24px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .sidebar-logo-wrap {
+        display: inline-block;
+        text-decoration: none;
+      }
+      .sidebar-logo {
+        height: 36px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 100px;
+      }
+
+      .sidebar-nav {
+        flex: 1;
+        padding: 20px 12px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .nav-item.active {
+        background: linear-gradient(90deg, var(--tomato) 0%, #a81a1a 100%);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(214, 40, 40, 0.3);
+      }
+      .nav-item svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .btn-logout {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-logout:hover {
+        background: rgba(214, 40, 40, 0.2);
+        border-color: var(--tomato);
+        color: var(--tomato);
+      }
+
+      /* ============================================
+       MAIN CONTENT & SECTIONS
+       ============================================ */
+      .dash-hero {
+        position: relative;
+        background: radial-gradient(
+          ellipse at center,
+          #1a1a1a 0%,
+          #0d0d0d 100%
+        );
+        padding: 40px 20px 50px;
+        overflow: hidden;
+        border-bottom: 5px solid var(--ember);
+        color: #fff;
+      }
+      .dash-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(214, 40, 40, 0.25) 0%,
+          transparent 60%
+        );
+        z-index: 1;
+      }
+      .dash-hero::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 6px;
+        background: conic-gradient(
+          #d62828 90deg,
+          #fffdf7 90deg 180deg,
+          #d62828 180deg 270deg,
+          #fffdf7 270deg
+        );
+        background-size: 12px 12px;
+        z-index: 5;
+      }
+      .dash-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .dash-hero h1 {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(28px, 5vw, 40px);
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .dash-hero h1 span {
+        color: var(--ember);
+      }
+      .dash-hero p {
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+        font-size: 15px;
+      }
+
+      /* Tab Content Wrapper */
+      .dash-body {
+        padding: 30px 16px 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      @media (min-width: 768px) {
+        .dash-body {
+          padding: 40px 24px 80px;
+        }
+      }
+
+      /* Tab Sections */
+      .tab-section {
+        display: none;
+        animation: fadeInTab 0.4s ease-out forwards;
+      }
+      .tab-section.active {
+        display: block;
+      }
+      @keyframes fadeInTab {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============================================
+       STATS CARDS
+       ============================================ */
+      .stat-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        padding: 20px;
+        height: 100%;
+        box-shadow:
+          0 8px 20px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+          0 16px 30px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tomato), var(--ember));
+      }
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        background: rgba(214, 40, 40, 0.1);
+        color: var(--tomato);
+      }
+      .stat-icon.is-yellow {
+        background: rgba(255, 195, 0, 0.15);
+        color: var(--ember-dark);
+      }
+      .stat-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+      .stat-value {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(28px, 4vw, 36px);
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #7a6a55;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .stat-trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 10px;
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+      .stat-trend.up {
+        background: rgba(30, 142, 62, 0.1);
+        color: #1e8e3e;
+      }
+      .stat-trend.down {
+        background: rgba(197, 23, 46, 0.1);
+        color: #c5172e;
+      }
+
+      /* ============================================
+       CHARTS & CARDS
+       ============================================ */
+      .chart-card,
+      .content-card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        padding: 20px;
+        height: 100%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+      .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .chart-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        margin: 0;
+        color: var(--ink);
+      }
+      .chart-sub {
+        font-size: 12px;
+        color: #7a6a55;
+        margin: 0;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 260px;
+        width: 100%;
+      }
+      @media (min-width: 768px) {
+        .chart-container {
+          height: 300px;
+        }
+      }
+
+      /* ============================================
+       TABLES (For Orders & Customers)
+       ============================================ */
+      .table-responsive {
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: #fff;
+      }
+      .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+      .table th {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7a6a55;
+        background: #f9f6f0;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        white-space: nowrap;
+      }
+      .table td {
+        padding: 12px 16px;
+        font-size: 13px;
+        color: var(--ink);
+        border-bottom: 1px solid #f0e8d8;
+      }
+      .table tbody tr:hover {
+        background-color: #fffcf5;
+      }
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Status Pills */
+      .status-pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .status-pill.pending {
+        background: rgba(255, 195, 0, 0.2);
+        color: var(--ember-dark);
+      }
+      .status-pill.resolved {
+        background: rgba(30, 142, 62, 0.1);
+        color: #1e8e3e;
+      }
+      .status-pill.urgent {
+        background: rgba(197, 23, 46, 0.1);
+        color: #c5172e;
+      }
+      .status-pill.active {
+        background: rgba(30, 142, 62, 0.1);
+        color: #1e8e3e;
+      }
+      .status-pill.inactive {
+        background: rgba(0, 0, 0, 0.05);
+        color: #7a6a55;
+      }
+
+      /* ============================================
+       MENU ITEMS GRID
+       ============================================ */
+      .menu-admin-card {
+        display: flex;
+        gap: 16px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .menu-admin-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+      }
+      .menu-admin-img {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+      .menu-admin-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .menu-admin-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 15px;
+        margin: 0 0 4px;
+      }
+      .menu-admin-price {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--tomato);
+      }
+
+      /* Settings Form */
+      .settings-form .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #5c4f3e;
+        margin-bottom: 6px;
+      }
+      .settings-form .form-control {
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 14px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s;
+      }
+      .settings-form .form-control:focus {
+        border-color: var(--tomato);
+        box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
+      }
+
+      .btn-primary-custom {
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 50%,
+          #a81a1a 100%
+        );
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 4px 0 var(--tomato-dark);
+        transition: all 0.1s;
+      }
+      .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        color: #fff;
+      }
+      .btn-primary-custom:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 var(--tomato-dark);
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Mobile Top Bar -->
+    <div class="mobile-topbar">
+      <a href="./admin.html" class="mobile-logo-wrap">
+        <!-- REPLACE WITH YOUR LOGO SRC -->
+        <img src="./assets/logo.webp" alt="STACKLY" class="mobile-logo" />
+      </a>
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open Menu">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="dashboard-wrapper">
+      <!-- ============================================
+         SIDEBAR
+         ============================================ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="./admin.html" class="sidebar-logo-wrap">
+            <!-- REPLACE WITH YOUR LOGO SRC -->
+            <img src="./assets/logo.webp" alt="STACKLY" class="sidebar-logo" />
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- Dashboard (active) -->
+          <a href="#" class="nav-item active" data-target="dashboard">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Dashboard
+          </a>
+          <!-- Orders -->
+          <a href="#" class="nav-item" data-target="orders">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            Orders
+          </a>
+          <!-- Menu Items -->
+          <a href="#" class="nav-item" data-target="menu">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 6v6l4 2" />
+            </svg>
+            Menu Items
+          </a>
+          <!-- Customers -->
+          <a href="#" class="nav-item" data-target="customers">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Customers
+          </a>
+          <!-- Messages -->
+          <a href="#" class="nav-item" data-target="messages">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
+            </svg>
+            Messages
+          </a>
+          <!-- Settings -->
+          <a href="#" class="nav-item" data-target="settings">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+              />
+            </svg>
+            Settings
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button class="btn-logout" id="sidebarLogout">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 16px; height: 16px"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- ============================================
+         MAIN CONTENT
+         ============================================ -->
+      <main class="main-content">
+        <!-- Hero Banner -->
+        <section class="dash-hero">
+          <div class="dash-hero-content">
+            <h1 id="pageTitle">Admin <span>Dashboard</span></h1>
+            <p>
+              Welcome back,
+              <strong id="adminName" style="color: var(--ember)">Admin</strong>.
+              Here's what's cooking today.
+            </p>
+          </div>
+        </section>
+
+        <div class="dash-body">
+          <!-- ============================================
+             TAB: DASHBOARD (Default)
+             ============================================ -->
+          <div class="tab-section active" id="tab-dashboard">
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path
+                        d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                      />
+                    </svg>
+                  </div>
+                  <div class="stat-value">
+                    ₹<span data-count="12450">0</span>
+                  </div>
+                  <div class="stat-label">Total Revenue</div>
+                  <div class="stat-trend up">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="12"
+                      height="12"
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                    12% this week
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon is-yellow">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                      />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="342">0</span></div>
+                  <div class="stat-label">Total Orders</div>
+                  <div class="stat-trend up">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="12"
+                      height="12"
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                    8% this week
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="1205">0</span></div>
+                  <div class="stat-label">Active Users</div>
+                  <div class="stat-trend up">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="12"
+                      height="12"
+                    >
+                      <polyline points="18 15 12 9 6 15" />
+                    </svg>
+                    24% this week
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon is-yellow">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="18">0</span></div>
+                  <div class="stat-label">Pending Tickets</div>
+                  <div class="stat-trend down">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      width="12"
+                      height="12"
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                    2 resolved
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row g-3 mb-4">
+              <div class="col-12 col-lg-8">
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <div>
+                      <h3 class="chart-title">Revenue Overview</h3>
+                      <p class="chart-sub">Last 7 days performance</p>
+                    </div>
+                    <span class="status-pill resolved">+12.5%</span>
+                  </div>
+                  <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-4">
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <div>
+                      <h3 class="chart-title">Sales by Category</h3>
+                      <p class="chart-sub">All-time breakdown</p>
+                    </div>
+                  </div>
+                  <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lower Row: Tickets & Reviews -->
+            <div class="row g-3">
+              <div class="col-12 col-lg-7">
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Recent Messages & Tickets</h3>
+                    <a
+                      href="#"
+                      class="switch-tab"
+                      data-target="messages"
+                      style="
+                        font-size: 12px;
+                        font-weight: 700;
+                        color: var(--tomato);
+                        text-decoration: none;
+                      "
+                      >View All</a
+                    >
+                  </div>
+                  <!-- Reuse the list from before -->
+                  <div
+                    class="ticket-item"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      padding: 14px 0;
+                      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    "
+                  >
+                    <img
+                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                      alt="User"
+                      style="
+                        width: 42px;
+                        height: 42px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 2px solid var(--border);
+                      "
+                    />
+                    <div style="flex: 1">
+                      <h4
+                        style="
+                          font-family: &quot;Bricolage Grotesque&quot;;
+                          font-weight: 800;
+                          font-size: 14px;
+                          margin: 0 0 2px;
+                        "
+                      >
+                        Arjun Mehta
+                      </h4>
+                      <p style="font-size: 12px; color: #7a6a55; margin: 0">
+                        Where is my order? It's been 40 minutes.
+                      </p>
+                    </div>
+                    <div style="text-align: right">
+                      <span
+                        style="
+                          font-size: 11px;
+                          color: #a89a85;
+                          display: block;
+                          margin-bottom: 4px;
+                        "
+                        >2m ago</span
+                      >
+                      <span class="status-pill urgent">Urgent</span>
+                    </div>
+                  </div>
+                  <div
+                    class="ticket-item"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      padding: 14px 0;
+                      border-bottom: none;
+                    "
+                  >
+                    <img
+                      src="https://randomuser.me/api/portraits/women/44.jpg"
+                      alt="User"
+                      style="
+                        width: 42px;
+                        height: 42px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                        border: 2px solid var(--border);
+                      "
+                    />
+                    <div style="flex: 1">
+                      <h4
+                        style="
+                          font-family: &quot;Bricolage Grotesque&quot;;
+                          font-weight: 800;
+                          font-size: 14px;
+                          margin: 0 0 2px;
+                        "
+                      >
+                        Priya Raman
+                      </h4>
+                      <p style="font-size: 12px; color: #7a6a55; margin: 0">
+                        Can I add extra cheese to my order?
+                      </p>
+                    </div>
+                    <div style="text-align: right">
+                      <span
+                        style="
+                          font-size: 11px;
+                          color: #a89a85;
+                          display: block;
+                          margin-bottom: 4px;
+                        "
+                        >15m ago</span
+                      >
+                      <span class="status-pill pending">Pending</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-5">
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Recent Reviews</h3>
+                    <a
+                      href="#"
+                      class="switch-tab"
+                      data-target="messages"
+                      style="
+                        font-size: 12px;
+                        font-weight: 700;
+                        color: var(--tomato);
+                        text-decoration: none;
+                      "
+                      >View All</a
+                    >
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      gap: 12px;
+                      padding: 12px 0;
+                      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    "
+                  >
+                    <img
+                      src="https://randomuser.me/api/portraits/women/68.jpg"
+                      style="
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                    />
+                    <div>
+                      <div style="color: var(--ember); font-size: 10px">
+                        ★★★★★
+                      </div>
+                      <p
+                        style="
+                          font-size: 12px;
+                          line-height: 1.4;
+                          color: #4a4136;
+                          margin: 0;
+                          font-style: italic;
+                        "
+                      >
+                        "The Paneer Tikka pizza is a stroke of genius. Spicy,
+                        creamy, and full of flavor."
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      gap: 12px;
+                      padding: 12px 0;
+                      border-bottom: none;
+                    "
+                  >
+                    <img
+                      src="https://randomuser.me/api/portraits/men/32.jpg"
+                      style="
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                      "
+                    />
+                    <div>
+                      <div style="color: var(--ember); font-size: 10px">
+                        ★★★★★
+                      </div>
+                      <p
+                        style="
+                          font-size: 12px;
+                          line-height: 1.4;
+                          color: #4a4136;
+                          margin: 0;
+                          font-style: italic;
+                        "
+                      >
+                        "Ordered the Meat Lovers and it arrived piping hot in 25
+                        minutes."
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Dashboard -->
+
+          <!-- ============================================
+             TAB: ORDERS
+             ============================================ -->
+          <div class="tab-section" id="tab-orders">
+            <div class="content-card">
+              <div class="chart-header">
+                <h3 class="chart-title">All Orders</h3>
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  style="font-size: 12px; font-weight: 700"
+                  onclick="window.location.href = './404.html'"
+                >
+                  Export CSV
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>#ORD-7291</strong></td>
+                      <td>Arjun Mehta</td>
+                      <td>Today, 10:42 AM</td>
+                      <td>₹1,240</td>
+                      <td><span class="status-pill pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7290</strong></td>
+                      <td>Priya Raman</td>
+                      <td>Today, 10:15 AM</td>
+                      <td>₹860</td>
+                      <td><span class="status-pill active">Preparing</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7289</strong></td>
+                      <td>Vikram Das</td>
+                      <td>Today, 09:50 AM</td>
+                      <td>₹2,100</td>
+                      <td>
+                        <span class="status-pill resolved">Delivered</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7288</strong></td>
+                      <td>Sneha Iyer</td>
+                      <td>Yesterday, 08:30 PM</td>
+                      <td>₹549</td>
+                      <td>
+                        <span class="status-pill resolved">Delivered</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7287</strong></td>
+                      <td>Rahul Kumar</td>
+                      <td>Yesterday, 07:12 PM</td>
+                      <td>₹1,450</td>
+                      <td><span class="status-pill urgent">Cancelled</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Orders -->
+
+          <!-- ============================================
+             TAB: MENU ITEMS
+             ============================================ -->
+          <div class="tab-section" id="tab-menu">
+            <div class="row g-3">
+              <div class="col-12 col-lg-8">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Menu Items</h3>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      style="
+                        font-size: 12px;
+                        font-weight: 700;
+                        background: var(--tomato);
+                      "
+                      onclick="window.location.href = './404.html'"
+                    >
+                      + Add New
+                    </button>
+                  </div>
+
+                  <!-- Item 1 -->
+                  <div class="menu-admin-card">
+                    <img
+                      src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&q=80"
+                      alt="Margherita"
+                      class="menu-admin-img"
+                    />
+                    <div class="menu-admin-info">
+                      <h4 class="menu-admin-title">Margherita</h4>
+                      <span class="menu-admin-price">₹249</span>
+                    </div>
+                    <div>
+                      <span class="status-pill active" style="margin-right: 8px"
+                        >Available</span
+                      >
+                      <button
+                        class="btn btn-sm btn-light"
+                        style="border: 1px solid #ddd; font-size: 11px"
+                        onclick="window.location.href = './404.html'"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Item 2 -->
+                  <div class="menu-admin-card">
+                    <img
+                      src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=200&q=80"
+                      alt="Pepperoni"
+                      class="menu-admin-img"
+                    />
+                    <div class="menu-admin-info">
+                      <h4 class="menu-admin-title">Pepperoni</h4>
+                      <span class="menu-admin-price">₹329</span>
+                    </div>
+                    <div>
+                      <span class="status-pill active" style="margin-right: 8px"
+                        >Available</span
+                      >
+                      <button
+                        class="btn btn-sm btn-light"
+                        style="border: 1px solid #ddd; font-size: 11px"
+                        onclick="window.location.href = './404.html'"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Item 3 -->
+                  <div class="menu-admin-card">
+                    <img
+                      src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&q=80"
+                      alt="STACKLY Special"
+                      class="menu-admin-img"
+                    />
+                    <div class="menu-admin-info">
+                      <h4 class="menu-admin-title">STACKLY Special</h4>
+                      <span class="menu-admin-price">₹549</span>
+                    </div>
+                    <div>
+                      <span
+                        class="status-pill inactive"
+                        style="margin-right: 8px"
+                        >Out of Stock</span
+                      >
+                      <button
+                        class="btn btn-sm btn-light"
+                        style="border: 1px solid #ddd; font-size: 11px"
+                        onclick="window.location.href = './404.html'"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Menu -->
+
+          <!-- ============================================
+             TAB: CUSTOMERS
+             ============================================ -->
+          <div class="tab-section" id="tab-customers">
+            <div class="content-card">
+              <div class="chart-header">
+                <h3 class="chart-title">Registered Customers</h3>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  placeholder="Search customers..."
+                  style="width: 200px; border-radius: 8px"
+                />
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Joined Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Arjun Mehta</strong></td>
+                      <td>arjun@example.com</td>
+                      <td><span class="status-pill pending">Admin</span></td>
+                      <td>12 Oct 2025</td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Priya Raman</strong></td>
+                      <td>priya@example.com</td>
+                      <td><span class="status-pill inactive">User</span></td>
+                      <td>05 Nov 2025</td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Vikram Das</strong></td>
+                      <td>vikram@example.com</td>
+                      <td><span class="status-pill inactive">User</span></td>
+                      <td>20 Sep 2025</td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Sneha Iyer</strong></td>
+                      <td>sneha@example.com</td>
+                      <td><span class="status-pill inactive">User</span></td>
+                      <td>14 Aug 2025</td>
+                      <td><span class="status-pill active">Active</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Customers -->
+
+          <!-- ============================================
+             TAB: MESSAGES
+             ============================================ -->
+          <div class="tab-section" id="tab-messages">
+            <div class="content-card">
+              <div class="chart-header">
+                <h3 class="chart-title">All Messages & Tickets</h3>
+              </div>
+
+              <div
+                class="ticket-item"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  padding: 16px 0;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                "
+              >
+                <img
+                  src="https://randomuser.me/api/portraits/men/32.jpg"
+                  alt="User"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--border);
+                  "
+                />
+                <div style="flex: 1">
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 4px;
+                    "
+                  >
+                    Arjun Mehta
+                  </h4>
+                  <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                    Where is my order? It's been 40 minutes. Order #ORD-7291.
+                  </p>
+                </div>
+                <div style="text-align: right">
+                  <span
+                    style="
+                      font-size: 11px;
+                      color: #a89a85;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >2m ago</span
+                  >
+                  <span class="status-pill urgent">Urgent</span>
+                </div>
+              </div>
+
+              <div
+                class="ticket-item"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  padding: 16px 0;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                "
+              >
+                <img
+                  src="https://randomuser.me/api/portraits/women/44.jpg"
+                  alt="User"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--border);
+                  "
+                />
+                <div style="flex: 1">
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 4px;
+                    "
+                  >
+                    Priya Raman
+                  </h4>
+                  <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                    Can I add extra cheese to my order? I already placed it 5
+                    mins ago.
+                  </p>
+                </div>
+                <div style="text-align: right">
+                  <span
+                    style="
+                      font-size: 11px;
+                      color: #a89a85;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >15m ago</span
+                  >
+                  <span class="status-pill pending">Pending</span>
+                </div>
+              </div>
+
+              <div
+                class="ticket-item"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  padding: 16px 0;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                "
+              >
+                <img
+                  src="https://randomuser.me/api/portraits/men/68.jpg"
+                  alt="User"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--border);
+                  "
+                />
+                <div style="flex: 1">
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 4px;
+                    "
+                  >
+                    Vikram Das
+                  </h4>
+                  <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                    The delivery driver was very polite. Great job! Please pass
+                    on the compliment.
+                  </p>
+                </div>
+                <div style="text-align: right">
+                  <span
+                    style="
+                      font-size: 11px;
+                      color: #a89a85;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >1h ago</span
+                  >
+                  <span class="status-pill resolved">Resolved</span>
+                </div>
+              </div>
+
+              <div
+                class="ticket-item"
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 16px;
+                  padding: 16px 0;
+                  border-bottom: none;
+                "
+              >
+                <img
+                  src="https://randomuser.me/api/portraits/women/65.jpg"
+                  alt="User"
+                  style="
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--border);
+                  "
+                />
+                <div style="flex: 1">
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 4px;
+                    "
+                  >
+                    Sneha Iyer
+                  </h4>
+                  <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                    Do you have vegan cheese options available? My friend is
+                    allergic to dairy.
+                  </p>
+                </div>
+                <div style="text-align: right">
+                  <span
+                    style="
+                      font-size: 11px;
+                      color: #a89a85;
+                      display: block;
+                      margin-bottom: 6px;
+                    "
+                    >3h ago</span
+                  >
+                  <span class="status-pill pending">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Messages -->
+
+          <!-- ============================================
+             TAB: SETTINGS
+             ============================================ -->
+          <div class="tab-section" id="tab-settings">
+            <div class="content-card settings-form">
+              <div class="chart-header">
+                <h3 class="chart-title">Store Settings</h3>
+              </div>
+              <form
+                onsubmit="
+                  event.preventDefault();
+                  alert('Settings saved successfully!');
+                "
+              >
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label">Store Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="STACKLY Pizza"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label">Contact Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      value="hello@stackly.pizza"
+                      required
+                    />
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Store Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="42 Marina Walk, Besant Nagar, Chennai, TN 600090"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label">Phone Number</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="+91 44 1234 5678"
+                      required
+                    />
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label">Delivery Radius (km)</label>
+                    <input type="number" class="form-control" value="10" />
+                  </div>
+                </div>
+                <button type="submit" class="btn-primary-custom mt-2">
+                  Save Changes
+                </button>
+              </form>
+            </div>
+          </div>
+          <!-- End Tab: Settings -->
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      /* ============================================================
+       1. AUTH GUARD & INIT
+       ============================================================ */
+      const STORAGE_KEY = "stackly_user";
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      } catch (_) {}
+
+      if (!user || !user.email || user.role !== "admin") {
+        window.location.href = "./login.html";
+      } else {
+        document.getElementById("adminName").textContent = user.name || "Admin";
+      }
+
+      /* ============================================================
+       2. LOGOUT
+       ============================================================ */
+      function handleLogout() {
+        localStorage.removeItem(STORAGE_KEY);
+        window.location.href = "./login.html";
+      }
+      document
+        .getElementById("sidebarLogout")
+        .addEventListener("click", handleLogout);
+
+      /* ============================================================
+       3. SIDEBAR TOGGLE & TAB SWITCHING
+       ============================================================ */
+      (function initNavigation() {
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        const navItems = document.querySelectorAll(".nav-item[data-target]");
+        const tabSections = document.querySelectorAll(".tab-section");
+        const pageTitleEl = document.getElementById("pageTitle");
+
+        // Mobile Sidebar
+        function openSidebar() {
+          sidebar.classList.add("is-open");
+          backdrop.classList.add("is-visible");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeSidebar() {
+          sidebar.classList.remove("is-open");
+          backdrop.classList.remove("is-visible");
+          document.body.style.overflow = "";
+        }
+
+        hamburgerBtn.addEventListener("click", openSidebar);
+        backdrop.addEventListener("click", closeSidebar);
+
+        // Tab Switching Logic
+        function switchTab(targetId) {
+          // 1. Hide all tabs
+          tabSections.forEach((tab) => tab.classList.remove("active"));
+
+          // 2. Show selected tab
+          const activeTab = document.getElementById(`tab-${targetId}`);
+          if (activeTab) activeTab.classList.add("active");
+
+          // 3. Update sidebar active state
+          navItems.forEach((item) => {
+            if (item.dataset.target === targetId) {
+              item.classList.add("active");
+            } else {
+              item.classList.remove("active");
+            }
+          });
+
+          // 4. Update Hero Title
+          const titles = {
+            dashboard: "Admin <span>Dashboard</span>",
+            orders: "Manage <span>Orders</span>",
+            menu: "Menu <span>Items</span>",
+            customers: "Registered <span>Customers</span>",
+            messages: "Customer <span>Messages</span>",
+            settings: "Store <span>Settings</span>",
+          };
+          pageTitleEl.innerHTML =
+            titles[targetId] || "Admin <span>Dashboard</span>";
+
+          // 5. Close mobile menu if open
+          closeSidebar();
+
+          // 6. Refresh AOS (since new elements might be visible)
+          if (typeof AOS !== "undefined") setTimeout(() => AOS.refresh(), 100);
+        }
+
+        // Attach click events to sidebar
+        navItems.forEach((item) => {
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchTab(item.dataset.target);
+          });
+        });
+
+        // Attach click events to "View All" buttons inside dashboard
+        document.querySelectorAll(".switch-tab").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchTab(link.dataset.target);
+          });
+        });
+      })();
+
+      /* ============================================================
+       4. AOS ANIMATIONS
+       ============================================================ */
+      AOS.init({
+        duration: 700,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 50,
+        disable: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+
+      /* ============================================================
+       5. GSAP COUNTERS
+       ============================================================ */
+      (function initCounters() {
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        if (reduceMotion) return;
+
+        const items = document.querySelectorAll("[data-count]");
+        items.forEach((el) => {
+          const target = parseInt(el.dataset.count, 10) || 0;
+          const obj = { val: 0 };
+
+          gsap.to(obj, {
+            val: target,
+            duration: 2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 90%",
+              once: true,
+            },
+            onUpdate: () => {
+              el.textContent = Math.round(obj.val).toLocaleString("en-IN");
+            },
+          });
+        });
+      })();
+
+      /* ============================================================
+       6. CHART.JS (Rendered on Dashboard Tab)
+       ============================================================ */
+      let chartsInitialized = false;
+
+      function initCharts() {
+        if (chartsInitialized) return;
+        chartsInitialized = true;
+
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = "#7a6a55";
+
+        const colors = {
+          tomato: "#D62828",
+          ember: "#FFC300",
+          ink: "#0D0D0D",
+        };
+
+        // 1. Bar Chart (Revenue)
+        const ctxBar = document.getElementById("revenueChart").getContext("2d");
+        const gradientBar = ctxBar.createLinearGradient(0, 0, 0, 300);
+        gradientBar.addColorStop(0, colors.tomato);
+        gradientBar.addColorStop(1, "#a81a1a");
+
+        new Chart(ctxBar, {
+          type: "bar",
+          data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [
+              {
+                label: "Revenue (₹)",
+                data: [1200, 1900, 1500, 2400, 3200, 4800, 4200],
+                backgroundColor: gradientBar,
+                borderRadius: 6,
+                borderSkipped: false,
+                barThickness: 24,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: colors.ink,
+                titleFont: { size: 12, weight: "bold" },
+                bodyFont: { size: 13 },
+                padding: 10,
+                cornerRadius: 8,
+                displayColors: false,
+                callbacks: {
+                  label: (context) =>
+                    "₹" + context.parsed.y.toLocaleString("en-IN"),
+                },
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: "rgba(0,0,0,0.04)", drawBorder: false },
+                ticks: { callback: (value) => "₹" + value, font: { size: 11 } },
+              },
+              x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { font: { size: 11, weight: "600" } },
+              },
+            },
+          },
+        });
+
+        // 2. Pie/Doughnut Chart (Category Split)
+        const ctxPie = document
+          .getElementById("categoryChart")
+          .getContext("2d");
+        new Chart(ctxPie, {
+          type: "doughnut",
+          data: {
+            labels: ["Classic", "Meat", "Veggie", "Signature"],
+            datasets: [
+              {
+                data: [35, 25, 20, 20],
+                backgroundColor: [
+                  colors.tomato,
+                  colors.ember,
+                  colors.ink,
+                  "#a89a85",
+                ],
+                borderWidth: 3,
+                borderColor: "#ffffff",
+                hoverOffset: 6,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "70%",
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: "circle",
+                  padding: 20,
+                  font: { size: 11, weight: "600" },
+                },
+              },
+              tooltip: {
+                backgroundColor: colors.ink,
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: (context) =>
+                    " " + context.label + ": " + context.parsed + "%",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Initialize charts when the dashboard is first shown (or right away since it's the default tab)
+      // Small timeout ensures DOM is fully ready and visible
+      setTimeout(initCharts, 200);
+
+      // If user switches back to dashboard, ensure charts are rendered (handles edge cases on mobile)
+      document
+        .querySelector('.nav-item[data-target="dashboard"]')
+        .addEventListener("click", () => {
+          setTimeout(initCharts, 100);
+        });
+    </script>
+  </body>
+</html>

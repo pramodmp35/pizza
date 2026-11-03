@@ -1,0 +1,1773 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Sign In — STACKLY</title>
+    <meta
+      name="description"
+      content="Sign in to STACKLY — order pizzas, track deliveries, and unlock member deals."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800;12..96,900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap & Tailwind -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              tomato: "#D62828",
+              ember: "#FFC300",
+              ink: "#0D0D0D",
+              paper: "#FFFDF7",
+            },
+            fontFamily: {
+              display: ['"Bricolage Grotesque"', "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      /* ============================================
+       BASE / TOKENS
+       ============================================ */
+      :root {
+        --tomato: #d62828;
+        --tomato-dark: #8b1a1e;
+        --ember: #ffc300;
+        --ember-dark: #b8770d;
+        --ink: #0d0d0d;
+        --paper: #fffdf7;
+        --cream: #fff8ec;
+        --border: #e8dcc5;
+        --error: #c5172e;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+        background-color: var(--ink);
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+        -webkit-text-size-adjust: 100%;
+      }
+
+      /* ============================================
+       AUTH PAGE LAYOUT
+       ============================================ */
+      .auth-page {
+        min-height: 100vh;
+        padding: 32px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        background: radial-gradient(
+          ellipse at center,
+          #1a1a1a 0%,
+          #0d0d0d 100%
+        );
+      }
+
+      /* Decorative background glows */
+      .auth-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            circle at 15% 20%,
+            rgba(214, 40, 40, 0.2) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 85% 80%,
+            rgba(255, 195, 0, 0.12) 0%,
+            transparent 55%
+          );
+      }
+
+      /* Floating pizza SVGs */
+      .auth-float {
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        opacity: 0.06;
+        z-index: 1;
+        pointer-events: none;
+        animation: authFloat 12s ease-in-out infinite;
+      }
+      .auth-float-1 {
+        top: 8%;
+        left: 5%;
+        animation-delay: 0s;
+      }
+      .auth-float-2 {
+        bottom: 10%;
+        right: 5%;
+        animation-delay: 2s;
+        width: 220px;
+        height: 220px;
+      }
+      .auth-float-3 {
+        top: 50%;
+        right: 15%;
+        animation-delay: 4s;
+        width: 120px;
+        height: 120px;
+      }
+      @keyframes authFloat {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-30px) rotate(20deg);
+        }
+      }
+      @media (min-width: 992px) {
+        .auth-float {
+          opacity: 0.08;
+        }
+      }
+
+      /* Top checkered accent strip */
+      .auth-page::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: conic-gradient(
+          #d62828 90deg,
+          #fffdf7 90deg 180deg,
+          #d62828 180deg 270deg,
+          #fffdf7 270deg
+        );
+        background-size: 14px 14px;
+        z-index: 10;
+      }
+
+      /* ============================================
+       AUTH WRAPPER
+       ============================================ */
+      .auth-wrapper {
+        width: 100%;
+        max-width: 1120px;
+        position: relative;
+        z-index: 5;
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============================================
+       FLIP CARD (FIXED)
+       ============================================ */
+      .auth-card {
+        perspective: 2500px;
+        position: relative;
+        width: 100%;
+        border-radius: 20px;
+        box-shadow:
+          0 40px 80px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(255, 255, 255, 0.05);
+      }
+      @media (min-width: 768px) {
+        .auth-card {
+          border-radius: 24px;
+        }
+      }
+
+      .flipper {
+        /* Using grid to automatically size to the tallest face */
+        display: grid;
+        transform-style: preserve-3d;
+        transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+      }
+      .flipper.is-flipped {
+        transform: rotateY(180deg);
+      }
+
+      /* Faces */
+      .auth-face {
+        /* Both faces occupy the same grid area */
+        grid-area: 1 / 1;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        display: grid;
+        grid-template-columns: 1fr;
+        background: var(--paper);
+        border-radius: inherit;
+        overflow: hidden;
+      }
+      .auth-front {
+        transform: rotateY(0deg);
+        z-index: 2;
+      }
+      .auth-back {
+        transform: rotateY(180deg);
+        z-index: 1;
+      }
+
+      /* ============================================
+       LEFT PANEL (Brand)
+       ============================================ */
+      .auth-left {
+        background:
+          radial-gradient(
+            circle at 30% 10%,
+            rgba(255, 195, 0, 0.14) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            circle at 70% 90%,
+            rgba(214, 40, 40, 0.24) 0%,
+            transparent 55%
+          ),
+          linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+        color: #fff;
+        padding: 28px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Subtle diagonal pattern */
+      .auth-left::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle,
+          rgba(255, 195, 0, 0.04) 1px,
+          transparent 1.5px
+        );
+        background-size: 24px 24px;
+        pointer-events: none;
+      }
+      .auth-left::after {
+        content: "";
+        position: absolute;
+        bottom: -60px;
+        right: -60px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 195, 0, 0.15) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      /* Brand logo */
+      .brand-logo-wrap {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-logo {
+        height: 44px;
+        width: auto;
+        object-fit: contain;
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+        /* Fallback style for missing image */
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px dashed rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        min-width: 100px;
+      }
+
+      /* Brand heading block */
+      .brand-hero {
+        position: relative;
+        z-index: 2;
+        display: none;
+      }
+      .brand-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        color: #fff;
+        margin: 0 0 14px;
+      }
+      .brand-title .accent {
+        color: var(--ember);
+      }
+      .brand-desc {
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.72);
+        margin: 0 0 24px;
+        max-width: 34ch;
+      }
+
+      /* Feature list */
+      .brand-features {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .brand-features li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.4;
+      }
+      .feature-check {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #e63946, #b81c1c);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        box-shadow:
+          0 3px 8px rgba(214, 40, 40, 0.4),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.3);
+      }
+      .feature-check svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      /* Brand footer */
+      .brand-footer {
+        position: relative;
+        z-index: 2;
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.4);
+      }
+      .brand-footer .dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--tomato);
+        display: inline-block;
+        margin: 0 6px;
+        vertical-align: middle;
+      }
+
+      /* Small tagline (mobile only) */
+      .brand-tagline {
+        position: relative;
+        z-index: 2;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: -0.01em;
+        color: #fff;
+        margin: 0;
+        line-height: 1.3;
+      }
+      .brand-tagline .accent {
+        color: var(--ember);
+      }
+
+      /* ============================================
+       RIGHT PANEL (Form)
+       ============================================ */
+      .auth-right {
+        background: var(--paper);
+        padding: 28px 20px 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: var(--ink);
+        position: relative;
+      }
+
+      .form-header {
+        margin-bottom: 22px;
+        text-align: center;
+      }
+      .form-header h2 {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 24px;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+        margin: 0 0 6px;
+      }
+      .form-header p {
+        font-size: 13px;
+        color: #7a6a55;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      /* ============================================
+       ROLE TOGGLE
+       ============================================ */
+      .role-toggle {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        background: #f5eddf;
+        padding: 4px;
+        border-radius: 12px;
+        position: relative;
+        margin-bottom: 22px;
+        border: 1px solid var(--border);
+      }
+      .role-btn {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 11px 8px;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 11.5px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #7a6a55;
+        background: transparent;
+        border: none;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .role-btn svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+      }
+      .role-btn.is-active {
+        color: #fff;
+      }
+      .role-slider {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: calc(50% - 4px);
+        height: calc(100% - 8px);
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 50%,
+          #a81a1a 100%
+        );
+        border-radius: 9px;
+        box-shadow:
+          0 3px 0 var(--tomato-dark),
+          0 6px 14px rgba(214, 40, 40, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+      }
+      .role-toggle[data-active="admin"] .role-slider {
+        transform: translateX(100%);
+      }
+
+      /* ============================================
+       FORM FIELDS
+       ============================================ */
+      .form-field {
+        margin-bottom: 14px;
+      }
+      .form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #5c4f3e;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 13px 14px;
+        background: var(--paper);
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        line-height: 1.35;
+        color: var(--ink);
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          background 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      .form-input::placeholder {
+        color: #a89a85;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--tomato);
+        box-shadow:
+          inset 0 2px 4px rgba(0, 0, 0, 0.06),
+          0 0 0 4px rgba(214, 40, 40, 0.14);
+      }
+      .form-input.is-error {
+        border-color: var(--error);
+        background: #fff5f5;
+        animation: shake 0.35s ease;
+      }
+      .field-error {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 500;
+        color: var(--error);
+        margin-top: 5px;
+        min-height: 14px;
+        opacity: 0;
+        transform: translateY(-3px);
+        transition:
+          opacity 0.2s ease,
+          transform 0.2s ease;
+      }
+      .field-error.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Password wrapper with eye toggle */
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap .form-input {
+        padding-right: 44px;
+      }
+      .toggle-pwd {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        padding: 6px;
+        color: #7a6a55;
+        cursor: pointer;
+        border-radius: 6px;
+        transition:
+          color 0.2s,
+          background 0.2s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .toggle-pwd:hover {
+        color: var(--tomato);
+        background: rgba(214, 40, 40, 0.06);
+      }
+      .toggle-pwd svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+      .toggle-pwd .icon-eye-off {
+        display: none;
+      }
+      .toggle-pwd.is-visible .icon-eye {
+        display: none;
+      }
+      .toggle-pwd.is-visible .icon-eye-off {
+        display: block;
+      }
+
+      /* Row for links */
+      .form-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        margin-top: 4px;
+      }
+      .forgot-link {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--tomato);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .forgot-link:hover {
+        color: var(--tomato-dark);
+        text-decoration: underline;
+      }
+
+      /* Submit button */
+      .btn-auth {
+        position: relative;
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px 24px;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 50%,
+          #a81a1a 100%
+        );
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow:
+          0 5px 0 var(--tomato-dark),
+          0 9px 20px rgba(214, 40, 40, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      .btn-auth:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 7px 0 var(--tomato-dark),
+          0 13px 24px rgba(214, 40, 40, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      .btn-auth:active {
+        transform: translateY(3px);
+        box-shadow:
+          0 2px 0 var(--tomato-dark),
+          0 4px 10px rgba(214, 40, 40, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+      .btn-auth.is-loading {
+        pointer-events: none;
+        opacity: 0.85;
+      }
+      .btn-auth.is-loading .btn-label {
+        visibility: hidden;
+      }
+      .btn-auth.is-loading::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Signup / Login switch */
+      .auth-switch {
+        text-align: center;
+        font-size: 12.5px;
+        color: #7a6a55;
+        margin-top: 20px;
+        line-height: 1.6;
+      }
+      .switch-link {
+        background: none;
+        border: none;
+        padding: 0;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--tomato);
+        cursor: pointer;
+        transition: color 0.2s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .switch-link:hover {
+        color: var(--tomato-dark);
+        text-decoration: underline;
+      }
+
+      /* ============================================
+       SHAKE ANIMATION
+       ============================================ */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-5px);
+        }
+        40% {
+          transform: translateX(5px);
+        }
+        60% {
+          transform: translateX(-3px);
+        }
+        80% {
+          transform: translateX(3px);
+        }
+      }
+
+      /* ============================================
+       DESKTOP / TABLET LAYOUT
+       ============================================ */
+      @media (min-width: 900px) {
+        .auth-face {
+          grid-template-columns: 1.05fr 1fr;
+        }
+        .auth-left {
+          padding: 56px 48px;
+          gap: 32px;
+        }
+        .brand-hero {
+          display: block;
+        }
+        .brand-tagline {
+          display: none;
+        }
+        .brand-logo {
+          height: 56px;
+          min-width: 130px;
+        }
+        .auth-right {
+          padding: 56px 52px;
+        }
+        .form-header {
+          text-align: left;
+          margin-bottom: 26px;
+        }
+        .form-header h2 {
+          font-size: 30px;
+        }
+        .form-header p {
+          font-size: 14px;
+        }
+      }
+
+      @media (min-width: 900px) and (max-width: 1100px) {
+        .auth-left {
+          padding: 44px 36px;
+        }
+        .auth-right {
+          padding: 44px 36px;
+        }
+      }
+
+      /* ============================================
+       REDUCED MOTION
+       ============================================ */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="auth-page">
+      <!-- Background decorations -->
+      <div class="auth-bg" aria-hidden="true"></div>
+
+      <!-- Floating pizza SVGs -->
+      <div class="auth-float auth-float-1" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="95" fill="#FFC300" />
+          <circle cx="80" cy="80" r="12" fill="#D62828" />
+          <circle cx="120" cy="100" r="12" fill="#D62828" />
+          <circle cx="90" cy="130" r="10" fill="#D62828" />
+        </svg>
+      </div>
+      <div class="auth-float auth-float-2" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="95" fill="#FFC300" />
+          <circle cx="70" cy="90" r="14" fill="#D62828" />
+          <circle cx="130" cy="80" r="12" fill="#D62828" />
+          <circle cx="100" cy="140" r="11" fill="#D62828" />
+        </svg>
+      </div>
+      <div class="auth-float auth-float-3" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="95" fill="#FFC300" />
+          <circle cx="100" cy="100" r="14" fill="#D62828" />
+        </svg>
+      </div>
+
+      <!-- Main auth wrapper -->
+      <div class="auth-wrapper">
+        <div class="auth-card">
+          <div class="flipper" id="flipper">
+            <!-- ==================================================
+               FRONT FACE — LOGIN
+               ================================================== -->
+            <div class="auth-face auth-front" id="loginFace">
+              <!-- LEFT PANEL -->
+              <div class="auth-left">
+                <div class="brand-logo-wrap">
+                  <!-- REPLACE WITH YOUR LOGO SRC -->
+                  <img
+                    src="./assets/logo.webp"
+                    alt="STACKLY Logo"
+                    class="brand-logo"
+                  />
+                </div>
+
+                <p class="brand-tagline">
+                  Slice into <br /><span class="accent"
+                    >something delicious.</span
+                  >
+                </p>
+
+                <div class="brand-hero">
+                  <h1 class="brand-title">
+                    Welcome<br /><span class="accent">Back.</span>
+                  </h1>
+                  <p class="brand-desc">
+                    Sign in to order your favourite pies, track deliveries, and
+                    unlock member-only offers.
+                  </p>
+
+                  <ul class="brand-features">
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      30-minute delivery guarantee
+                    </li>
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      Exclusive member deals &amp; early drops
+                    </li>
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      Order history &amp; one-tap reorder
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="brand-footer">
+                  <span>&copy; 2026 STACKLY</span>
+                  <span><span class="dot"></span>Secure Sign-In</span>
+                </div>
+              </div>
+
+              <!-- RIGHT PANEL -->
+              <div class="auth-right">
+                <div class="form-header">
+                  <h2>Sign In</h2>
+                  <p>Pick your role and enter your details.</p>
+                </div>
+
+                <!-- Role toggle -->
+                <div
+                  class="role-toggle"
+                  data-active="user"
+                  data-target="login"
+                  role="tablist"
+                  aria-label="Select login role"
+                >
+                  <button
+                    type="button"
+                    class="role-btn is-active"
+                    data-role="user"
+                    role="tab"
+                    aria-selected="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    class="role-btn"
+                    data-role="admin"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    Admin
+                  </button>
+                  <div class="role-slider" aria-hidden="true"></div>
+                </div>
+
+                <!-- Login form -->
+                <form id="loginForm" novalidate>
+                  <div class="form-field">
+                    <label for="loginEmail" class="form-label">Email</label>
+                    <input
+                      type="email"
+                      id="loginEmail"
+                      name="email"
+                      class="form-input"
+                      placeholder="you@example.com"
+                      required
+                      autocomplete="email"
+                    />
+                    <span
+                      class="field-error"
+                      id="loginEmailErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="loginPassword" class="form-label"
+                      >Password</label
+                    >
+                    <div class="password-wrap">
+                      <input
+                        type="password"
+                        id="loginPassword"
+                        name="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                      />
+                      <button
+                        type="button"
+                        class="toggle-pwd"
+                        data-target="loginPassword"
+                        aria-label="Show password"
+                      >
+                        <svg
+                          class="icon-eye"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                          />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <svg
+                          class="icon-eye-off"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                          />
+                          <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span
+                      class="field-error"
+                      id="loginPasswordErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <div class="form-row">
+                    <span></span>
+                    <a href="./404.html" class="forgot-link"
+                      >Forgot password?</a
+                    >
+                  </div>
+
+                  <button type="submit" class="btn-auth" id="loginSubmit">
+                    <span class="btn-label">Sign In</span>
+                  </button>
+                </form>
+
+                <p class="auth-switch">
+                  New to STACKLY?<br />
+                  <button type="button" class="switch-link" id="showSignup">
+                    Create an account
+                  </button>
+                </p>
+              </div>
+            </div>
+
+            <!-- ==================================================
+               BACK FACE — SIGNUP
+               ================================================== -->
+            <div class="auth-face auth-back" id="signupFace">
+              <!-- LEFT PANEL -->
+              <div class="auth-left">
+                <div class="brand-logo-wrap">
+                  <!-- REPLACE WITH YOUR LOGO SRC -->
+                  <img
+                    src="./assets/logo.webp"
+                    alt="STACKLY Logo"
+                    class="brand-logo"
+                  />
+                </div>
+
+                <p class="brand-tagline">
+                  Join the <br /><span class="accent">slice squad.</span>
+                </p>
+
+                <div class="brand-hero">
+                  <h1 class="brand-title">
+                    Join<br /><span class="accent">STACKLY.</span>
+                  </h1>
+                  <p class="brand-desc">
+                    Create your account in under a minute and get a slice of the
+                    good stuff — first order deal on us.
+                  </p>
+
+                  <ul class="brand-features">
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      10% off your first order
+                    </li>
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      Free delivery on orders over ₹499
+                    </li>
+                    <li>
+                      <span class="feature-check">
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </span>
+                      Members-only weekend specials
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="brand-footer">
+                  <span>&copy; 2026 STACKLY</span>
+                  <span><span class="dot"></span>Free to join</span>
+                </div>
+              </div>
+
+              <!-- RIGHT PANEL -->
+              <div class="auth-right">
+                <div class="form-header">
+                  <h2>Create Account</h2>
+                  <p>Tell us a bit about you — takes 30 seconds.</p>
+                </div>
+
+                <!-- Role toggle -->
+                <div
+                  class="role-toggle"
+                  data-active="user"
+                  data-target="signup"
+                  role="tablist"
+                  aria-label="Select account role"
+                >
+                  <button
+                    type="button"
+                    class="role-btn is-active"
+                    data-role="user"
+                    role="tab"
+                    aria-selected="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    User
+                  </button>
+                  <button
+                    type="button"
+                    class="role-btn"
+                    data-role="admin"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    Admin
+                  </button>
+                  <div class="role-slider" aria-hidden="true"></div>
+                </div>
+
+                <!-- Signup form -->
+                <form id="signupForm" novalidate>
+                  <div class="form-field">
+                    <label for="signupName" class="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      id="signupName"
+                      name="name"
+                      class="form-input"
+                      placeholder="Jane Dough"
+                      required
+                      autocomplete="name"
+                    />
+                    <span
+                      class="field-error"
+                      id="signupNameErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="signupEmail" class="form-label">Email</label>
+                    <input
+                      type="email"
+                      id="signupEmail"
+                      name="email"
+                      class="form-input"
+                      placeholder="you@example.com"
+                      required
+                      autocomplete="email"
+                    />
+                    <span
+                      class="field-error"
+                      id="signupEmailErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="signupPassword" class="form-label"
+                      >Password</label
+                    >
+                    <div class="password-wrap">
+                      <input
+                        type="password"
+                        id="signupPassword"
+                        name="password"
+                        class="form-input"
+                        placeholder="At least 8 characters"
+                        required
+                        autocomplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        class="toggle-pwd"
+                        data-target="signupPassword"
+                        aria-label="Show password"
+                      >
+                        <svg
+                          class="icon-eye"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                          />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <svg
+                          class="icon-eye-off"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                          />
+                          <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span
+                      class="field-error"
+                      id="signupPasswordErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="signupConfirm" class="form-label"
+                      >Confirm Password</label
+                    >
+                    <div class="password-wrap">
+                      <input
+                        type="password"
+                        id="signupConfirm"
+                        name="confirm"
+                        class="form-input"
+                        placeholder="Re-enter password"
+                        required
+                        autocomplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        class="toggle-pwd"
+                        data-target="signupConfirm"
+                        aria-label="Show password"
+                      >
+                        <svg
+                          class="icon-eye"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                          />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <svg
+                          class="icon-eye-off"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                          />
+                          <line x1="1" y1="1" x2="23" y2="23" />
+                        </svg>
+                      </button>
+                    </div>
+                    <span
+                      class="field-error"
+                      id="signupConfirmErr"
+                      role="alert"
+                    ></span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="btn-auth"
+                    id="signupSubmit"
+                    style="margin-top: 8px"
+                  >
+                    <span class="btn-label">Create Account</span>
+                  </button>
+                </form>
+
+                <p class="auth-switch">
+                  Already have an account?<br />
+                  <button type="button" class="switch-link" id="showLogin">
+                    Sign in
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+      /* ============================================================
+       CONFIG
+       ============================================================ */
+      const STORAGE_KEY = "stackly_user";
+      const DASHBOARDS = {
+        user: "./user.html",
+        admin: "./admin.html",
+      };
+
+      /* ============================================================
+       1. FLIP CARD
+       ============================================================ */
+      (function initFlip() {
+        const flipper = document.getElementById("flipper");
+        const showSignup = document.getElementById("showSignup");
+        const showLogin = document.getElementById("showLogin");
+        let isSignup = false;
+
+        function flipTo(signup) {
+          isSignup = signup;
+          flipper.classList.toggle("is-flipped", signup);
+        }
+
+        showSignup.addEventListener("click", () => flipTo(true));
+        showLogin.addEventListener("click", () => flipTo(false));
+      })();
+
+      /* ============================================================
+       2. ROLE TOGGLE
+       ============================================================ */
+      (function initRoleToggle() {
+        const toggles = document.querySelectorAll(".role-toggle");
+        const state = { login: "user", signup: "user" };
+
+        toggles.forEach((toggle) => {
+          const target = toggle.dataset.target;
+          const buttons = toggle.querySelectorAll(".role-btn");
+
+          buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              buttons.forEach((b) => {
+                b.classList.remove("is-active");
+                b.setAttribute("aria-selected", "false");
+              });
+              btn.classList.add("is-active");
+              btn.setAttribute("aria-selected", "true");
+
+              const role = btn.dataset.role;
+              toggle.dataset.active = role;
+              state[target] = role;
+            });
+          });
+        });
+
+        window.getSelectedRole = (target) => state[target];
+      })();
+
+      /* ============================================================
+       3. PASSWORD VISIBILITY TOGGLE
+       ============================================================ */
+      document.querySelectorAll(".toggle-pwd").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const input = document.getElementById(btn.dataset.target);
+          if (!input) return;
+          const isVisible = input.type === "text";
+          input.type = isVisible ? "password" : "text";
+          btn.classList.toggle("is-visible", !isVisible);
+          btn.setAttribute(
+            "aria-label",
+            isVisible ? "Show password" : "Hide password",
+          );
+        });
+      });
+
+      /* ============================================================
+       4. VALIDATION HELPERS
+       ============================================================ */
+      function showError(inputEl, errEl, msg) {
+        inputEl.classList.add("is-error");
+        inputEl.setAttribute("aria-invalid", "true");
+        errEl.textContent = msg;
+        errEl.classList.add("is-visible");
+      }
+      function clearError(inputEl, errEl) {
+        inputEl.classList.remove("is-error");
+        inputEl.removeAttribute("aria-invalid");
+        errEl.textContent = "";
+        errEl.classList.remove("is-visible");
+      }
+      function focusFirstInvalid(el) {
+        if (!el) return;
+        el.focus({ preventScroll: false });
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+      /* ============================================================
+       5. LOGIN FORM
+       ============================================================ */
+      (function initLogin() {
+        const form = document.getElementById("loginForm");
+        const emailEl = document.getElementById("loginEmail");
+        const pwdEl = document.getElementById("loginPassword");
+        const emailErr = document.getElementById("loginEmailErr");
+        const pwdErr = document.getElementById("loginPasswordErr");
+        const btn = document.getElementById("loginSubmit");
+        let submitted = false;
+
+        // Prefill email if stored
+        try {
+          const stored = JSON.parse(
+            localStorage.getItem(STORAGE_KEY) || "null",
+          );
+          if (stored && stored.email) {
+            emailEl.value = stored.email;
+            if (stored.role) {
+              const activeToggle = document.querySelector(
+                '.role-toggle[data-target="login"]',
+              );
+              const targetBtn = activeToggle.querySelector(
+                `.role-btn[data-role="${stored.role}"]`,
+              );
+              if (targetBtn) {
+                activeToggle.querySelectorAll(".role-btn").forEach((b) => {
+                  b.classList.remove("is-active");
+                  b.setAttribute("aria-selected", "false");
+                });
+                targetBtn.classList.add("is-active");
+                targetBtn.setAttribute("aria-selected", "true");
+                activeToggle.dataset.active = stored.role;
+              }
+            }
+          }
+        } catch (e) {
+          /* ignore */
+        }
+
+        function validate() {
+          let ok = true;
+          let firstInvalid = null;
+
+          if (!emailRegex.test(emailEl.value.trim())) {
+            showError(emailEl, emailErr, "Please enter a valid email address.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = emailEl;
+          } else {
+            clearError(emailEl, emailErr);
+          }
+
+          if (pwdEl.value.length < 6) {
+            showError(pwdEl, pwdErr, "Password must be at least 6 characters.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = pwdEl;
+          } else {
+            clearError(pwdEl, pwdErr);
+          }
+
+          if (firstInvalid) focusFirstInvalid(firstInvalid);
+          return ok;
+        }
+
+        [emailEl, pwdEl].forEach((el) => {
+          el.addEventListener("blur", () => {
+            if (submitted) validate();
+          });
+          el.addEventListener("input", () => {
+            if (submitted && el.classList.contains("is-error")) validate();
+          });
+        });
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          submitted = true;
+
+          if (!validate()) return;
+
+          btn.classList.add("is-loading");
+
+          const role = window.getSelectedRole("login");
+          const email = emailEl.value.trim();
+
+          let existingName = "";
+          try {
+            const prev = JSON.parse(
+              localStorage.getItem(STORAGE_KEY) || "null",
+            );
+            if (prev && prev.email === email && prev.name)
+              existingName = prev.name;
+          } catch (_) {}
+
+          const user = {
+            name: existingName || email.split("@")[0],
+            email: email,
+            role: role,
+            loggedInAt: new Date().toISOString(),
+          };
+
+          setTimeout(() => {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            } catch (_) {}
+            window.location.href = DASHBOARDS[role] || DASHBOARDS.user;
+          }, 700);
+        });
+      })();
+
+      /* ============================================================
+       6. SIGNUP FORM
+       ============================================================ */
+      (function initSignup() {
+        const form = document.getElementById("signupForm");
+        const nameEl = document.getElementById("signupName");
+        const emailEl = document.getElementById("signupEmail");
+        const pwdEl = document.getElementById("signupPassword");
+        const confirmEl = document.getElementById("signupConfirm");
+
+        const nameErr = document.getElementById("signupNameErr");
+        const emailErr = document.getElementById("signupEmailErr");
+        const pwdErr = document.getElementById("signupPasswordErr");
+        const confirmErr = document.getElementById("signupConfirmErr");
+
+        const btn = document.getElementById("signupSubmit");
+        let submitted = false;
+
+        function validate() {
+          let ok = true;
+          let firstInvalid = null;
+
+          if (nameEl.value.trim().length < 2) {
+            showError(nameEl, nameErr, "Please enter your full name.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = nameEl;
+          } else {
+            clearError(nameEl, nameErr);
+          }
+
+          if (!emailRegex.test(emailEl.value.trim())) {
+            showError(emailEl, emailErr, "Please enter a valid email address.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = emailEl;
+          } else {
+            clearError(emailEl, emailErr);
+          }
+
+          if (pwdEl.value.length < 8) {
+            showError(pwdEl, pwdErr, "Password must be at least 8 characters.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = pwdEl;
+          } else {
+            clearError(pwdEl, pwdErr);
+          }
+
+          if (confirmEl.value !== pwdEl.value || confirmEl.value === "") {
+            showError(confirmEl, confirmErr, "Passwords do not match.");
+            ok = false;
+            if (!firstInvalid) firstInvalid = confirmEl;
+          } else {
+            clearError(confirmEl, confirmErr);
+          }
+
+          if (firstInvalid) focusFirstInvalid(firstInvalid);
+          return ok;
+        }
+
+        [nameEl, emailEl, pwdEl, confirmEl].forEach((el) => {
+          el.addEventListener("blur", () => {
+            if (submitted) validate();
+          });
+          el.addEventListener("input", () => {
+            if (submitted && el.classList.contains("is-error")) validate();
+          });
+        });
+
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          submitted = true;
+
+          if (!validate()) return;
+
+          btn.classList.add("is-loading");
+
+          const role = window.getSelectedRole("signup");
+
+          const user = {
+            name: nameEl.value.trim(),
+            email: emailEl.value.trim(),
+            role: role,
+            createdAt: new Date().toISOString(),
+            loggedInAt: new Date().toISOString(),
+          };
+
+          setTimeout(() => {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+            } catch (_) {}
+
+            btn.classList.remove("is-loading");
+
+            // Prefill login email + role
+            document.getElementById("loginEmail").value = user.email;
+
+            const loginToggle = document.querySelector(
+              '.role-toggle[data-target="login"]',
+            );
+            const targetBtn = loginToggle.querySelector(
+              `.role-btn[data-role="${role}"]`,
+            );
+            if (targetBtn) {
+              loginToggle.querySelectorAll(".role-btn").forEach((b) => {
+                b.classList.remove("is-active");
+                b.setAttribute("aria-selected", "false");
+              });
+              targetBtn.classList.add("is-active");
+              targetBtn.setAttribute("aria-selected", "true");
+              loginToggle.dataset.active = role;
+            }
+
+            // Reset signup form
+            form.reset();
+            submitted = false;
+            [nameEl, emailEl, pwdEl, confirmEl].forEach((el) => {
+              el.classList.remove("is-error");
+              el.removeAttribute("aria-invalid");
+            });
+            [nameErr, emailErr, pwdErr, confirmErr].forEach((e) => {
+              e.textContent = "";
+              e.classList.remove("is-visible");
+            });
+
+            // Flip back to login
+            document.getElementById("showLogin").click();
+
+            // Success feedback
+            setTimeout(() => {
+              const loginForm = document.getElementById("loginForm");
+              loginForm.style.transition = "box-shadow 0.4s";
+              loginForm.style.boxShadow = "0 0 0 3px rgba(30,142,62,0.35)";
+              setTimeout(() => {
+                loginForm.style.boxShadow = "";
+              }, 1200);
+            }, 500);
+          }, 800);
+        });
+      })();
+    </script>
+  </body>
+</html>

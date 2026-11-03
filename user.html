@@ -1,0 +1,1973 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>My Account — STACKLY</title>
+    <meta
+      name="description"
+      content="STACKLY User Dashboard — track orders, manage addresses, and view favorites."
+    />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800;12..96,900&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap & Tailwind -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            colors: {
+              tomato: "#D62828",
+              ember: "#FFC300",
+              ink: "#0D0D0D",
+              paper: "#FFFDF7",
+            },
+            fontFamily: {
+              display: ['"Bricolage Grotesque"', "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+    <style>
+      /* ============================================
+       BASE / TOKENS
+       ============================================ */
+      :root {
+        --tomato: #d62828;
+        --tomato-dark: #8b1a1e;
+        --ember: #ffc300;
+        --ember-dark: #b8770d;
+        --ink: #0d0d0d;
+        --paper: #fffdf7;
+        --cream: #fff8ec;
+        --border: #e8dcc5;
+        --footer-bg: #080808;
+        --sidebar-width: 260px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f7f3eb;
+        color: var(--ink);
+        margin: 0;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ============================================
+       LAYOUT
+       ============================================ */
+      .dashboard-wrapper {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--sidebar-width);
+        background: var(--ink);
+        color: #fff;
+        z-index: 1040;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease-in-out;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      }
+      .sidebar.is-open {
+        transform: translateX(0);
+      }
+      @media (min-width: 992px) {
+        .sidebar {
+          transform: translateX(0);
+        }
+      }
+
+      /* Main Content */
+      .main-content {
+        flex: 1;
+        width: 100%;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 992px) {
+        .main-content {
+          margin-left: var(--sidebar-width);
+        }
+      }
+
+      /* Mobile Top Bar */
+      .mobile-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        background: var(--ink);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+      @media (min-width: 992px) {
+        .mobile-topbar {
+          display: none;
+        }
+      }
+      .mobile-logo-wrap {
+        display: inline-block;
+        text-decoration: none;
+      }
+      .mobile-logo {
+        height: 32px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 90px;
+      }
+      .hamburger-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .hamburger-btn:hover {
+        background: var(--tomato);
+      }
+      .hamburger-btn svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* Backdrop */
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1035;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+      }
+      .sidebar-backdrop.is-visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      @media (min-width: 992px) {
+        .sidebar-backdrop {
+          display: none;
+        }
+      }
+
+      /* ============================================
+       SIDEBAR CONTENT
+       ============================================ */
+      .sidebar-header {
+        padding: 24px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .sidebar-logo-wrap {
+        display: inline-block;
+        text-decoration: none;
+      }
+      .sidebar-logo {
+        height: 36px;
+        width: auto;
+        object-fit: contain;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        min-width: 100px;
+      }
+
+      .sidebar-nav {
+        flex: 1;
+        padding: 20px 12px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .nav-item.active {
+        background: linear-gradient(90deg, var(--tomato) 0%, #a81a1a 100%);
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(214, 40, 40, 0.3);
+      }
+      .nav-item svg {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .btn-logout {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-logout:hover {
+        background: rgba(214, 40, 40, 0.2);
+        border-color: var(--tomato);
+        color: var(--tomato);
+      }
+
+      /* ============================================
+       MAIN CONTENT & SECTIONS
+       ============================================ */
+      .dash-hero {
+        position: relative;
+        background: radial-gradient(
+          ellipse at center,
+          #1a1a1a 0%,
+          #0d0d0d 100%
+        );
+        padding: 40px 20px 50px;
+        overflow: hidden;
+        border-bottom: 5px solid var(--ember);
+        color: #fff;
+      }
+      .dash-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(214, 40, 40, 0.25) 0%,
+          transparent 60%
+        );
+        z-index: 1;
+      }
+      .dash-hero::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 6px;
+        background: conic-gradient(
+          #d62828 90deg,
+          #fffdf7 90deg 180deg,
+          #d62828 180deg 270deg,
+          #fffdf7 270deg
+        );
+        background-size: 12px 12px;
+        z-index: 5;
+      }
+      .dash-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .dash-hero h1 {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(28px, 5vw, 40px);
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      .dash-hero h1 span {
+        color: var(--ember);
+      }
+      .dash-hero p {
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0;
+        font-size: 15px;
+      }
+
+      /* Tab Content Wrapper */
+      .dash-body {
+        padding: 30px 16px 60px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      @media (min-width: 768px) {
+        .dash-body {
+          padding: 40px 24px 80px;
+        }
+      }
+
+      /* Tab Sections */
+      .tab-section {
+        display: none;
+        animation: fadeInTab 0.4s ease-out forwards;
+      }
+      .tab-section.active {
+        display: block;
+      }
+      @keyframes fadeInTab {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ============================================
+       STATS CARDS
+       ============================================ */
+      .stat-card {
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf0 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        padding: 20px;
+        height: 100%;
+        box-shadow:
+          0 8px 20px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow:
+          0 16px 30px rgba(0, 0, 0, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 1);
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--tomato), var(--ember));
+      }
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        background: rgba(214, 40, 40, 0.1);
+        color: var(--tomato);
+      }
+      .stat-icon.is-yellow {
+        background: rgba(255, 195, 0, 0.15);
+        color: var(--ember-dark);
+      }
+      .stat-icon svg {
+        width: 24px;
+        height: 24px;
+      }
+      .stat-value {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 900;
+        font-size: clamp(28px, 4vw, 36px);
+        color: var(--ink);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #7a6a55;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* ============================================
+       CARDS & TABLES
+       ============================================ */
+      .content-card {
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 16px;
+        padding: 20px;
+        height: 100%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+      .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+      .chart-title {
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        margin: 0;
+        color: var(--ink);
+      }
+
+      .table-responsive {
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: #fff;
+      }
+      .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+      }
+      .table th {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #7a6a55;
+        background: #f9f6f0;
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        white-space: nowrap;
+      }
+      .table td {
+        padding: 12px 16px;
+        font-size: 13px;
+        color: var(--ink);
+        border-bottom: 1px solid #f0e8d8;
+      }
+      .table tbody tr:hover {
+        background-color: #fffcf5;
+      }
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Status Pills */
+      .status-pill {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .status-pill.pending {
+        background: rgba(255, 195, 0, 0.2);
+        color: var(--ember-dark);
+      }
+      .status-pill.resolved {
+        background: rgba(30, 142, 62, 0.1);
+        color: #1e8e3e;
+      }
+      .status-pill.active {
+        background: rgba(30, 142, 62, 0.1);
+        color: #1e8e3e;
+      }
+      .status-pill.inactive {
+        background: rgba(0, 0, 0, 0.05);
+        color: #7a6a55;
+      }
+      .status-pill.urgent {
+        background: rgba(197, 23, 46, 0.1);
+        color: #c5172e;
+      }
+
+      /* ============================================
+       ORDER TRACKER (Active Order)
+       ============================================ */
+      .tracker-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+      .tracker-steps::before {
+        content: "";
+        position: absolute;
+        top: 14px;
+        left: 10%;
+        right: 10%;
+        height: 4px;
+        background: #f0e8d8;
+        z-index: 1;
+        border-radius: 2px;
+      }
+      .tracker-progress {
+        position: absolute;
+        top: 14px;
+        left: 10%;
+        height: 4px;
+        background: var(--tomato);
+        z-index: 2;
+        border-radius: 2px;
+        width: 50%; /* Example progress */
+        transition: width 1s ease-in-out;
+      }
+      .step {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        width: 60px;
+      }
+      .step-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f0e8d8;
+        color: #a89a85;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 14px;
+        border: 4px solid #fff;
+      }
+      .step.completed .step-dot {
+        background: var(--tomato);
+        color: #fff;
+      }
+      .step.active .step-dot {
+        background: var(--ember);
+        color: var(--ink);
+        box-shadow: 0 0 0 4px rgba(255, 195, 0, 0.3);
+      }
+      .step-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #7a6a55;
+        text-align: center;
+        line-height: 1.2;
+      }
+      .step.completed .step-label,
+      .step.active .step-label {
+        color: var(--ink);
+      }
+
+      /* ============================================
+       PROFILE & ADDRESSES
+       ============================================ */
+      .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #e63946, #b81c1c);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Bricolage Grotesque", sans-serif;
+        font-size: 32px;
+        font-weight: 900;
+        margin-bottom: 16px;
+        box-shadow:
+          0 8px 18px rgba(214, 40, 40, 0.35),
+          inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+      }
+      .form-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #5c4f3e;
+        margin-bottom: 6px;
+      }
+      .form-control {
+        border: 2px solid var(--border);
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 14px;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s;
+      }
+      .form-control:focus {
+        border-color: var(--tomato);
+        box-shadow: 0 0 0 4px rgba(214, 40, 40, 0.1);
+      }
+
+      .address-card {
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        background: #fff;
+        position: relative;
+        transition: all 0.2s;
+      }
+      .address-card:hover {
+        border-color: var(--tomato);
+      }
+      .address-card.is-default {
+        border-color: var(--ember);
+        background: #fffdf7;
+      }
+      .address-badge {
+        position: absolute;
+        top: -10px;
+        right: 12px;
+        background: var(--ember);
+        color: var(--ink);
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 4px;
+      }
+
+      /* ============================================
+       FAVORITES (Mini Pizza Cards)
+       ============================================ */
+      .fav-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .fav-img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+      }
+      .fav-body {
+        padding: 12px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .fav-title {
+        font-family: "Bricolage Grotesque";
+        font-weight: 800;
+        font-size: 14px;
+        margin: 0 0 4px;
+      }
+      .fav-price {
+        color: var(--tomato);
+        font-weight: 800;
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      .btn-reorder {
+        margin-top: auto;
+        width: 100%;
+        padding: 8px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        border-radius: 6px;
+        border: none;
+        background: rgba(214, 40, 40, 0.1);
+        color: var(--tomato);
+        transition: all 0.2s;
+      }
+      .btn-reorder:hover {
+        background: var(--tomato);
+        color: #fff;
+      }
+
+      /* Utilities */
+      .btn-primary-custom {
+        background: linear-gradient(
+          180deg,
+          #e63946 0%,
+          #d62828 50%,
+          #a81a1a 100%
+        );
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 4px 0 var(--tomato-dark);
+        transition: all 0.1s;
+      }
+      .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        color: #fff;
+      }
+      .btn-primary-custom:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 var(--tomato-dark);
+      }
+
+      /* Reduced motion */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          transition-duration: 0.001ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Mobile Top Bar -->
+    <div class="mobile-topbar">
+      <a href="./user.html" class="mobile-logo-wrap">
+        <!-- REPLACE WITH YOUR LOGO SRC -->
+        <img src="./assets/logo.webp" alt="STACKLY" class="mobile-logo" />
+      </a>
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open Menu">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="dashboard-wrapper">
+      <!-- ============================================
+         SIDEBAR
+         ============================================ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="./user.html" class="sidebar-logo-wrap">
+            <!-- REPLACE WITH YOUR LOGO SRC -->
+            <img src="./assets/logo.webp" alt="STACKLY" class="sidebar-logo" />
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- Dashboard -->
+          <a href="#" class="nav-item active" data-target="dashboard">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Dashboard
+          </a>
+          <!-- My Orders -->
+          <a href="#" class="nav-item" data-target="orders">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            My Orders
+          </a>
+          <!-- Favorites -->
+          <a href="#" class="nav-item" data-target="favorites">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
+            </svg>
+            Favorites
+          </a>
+          <!-- Addresses -->
+          <a href="#" class="nav-item" data-target="addresses">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            Saved Addresses
+          </a>
+          <!-- Support -->
+          <a href="#" class="nav-item" data-target="support">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
+            </svg>
+            Support Tickets
+          </a>
+          <!-- Profile -->
+          <a href="#" class="nav-item" data-target="profile">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            My Profile
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <button class="btn-logout" id="sidebarLogout">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="width: 16px; height: 16px"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- ============================================
+         MAIN CONTENT
+         ============================================ -->
+      <main class="main-content">
+        <!-- Hero Banner -->
+        <section class="dash-hero">
+          <div class="dash-hero-content">
+            <h1 id="pageTitle">My <span>Dashboard</span></h1>
+            <p>
+              Welcome back,
+              <strong id="userName" style="color: var(--ember)">User</strong>.
+              Ready for a slice?
+            </p>
+          </div>
+        </section>
+
+        <div class="dash-body">
+          <!-- ============================================
+             TAB: DASHBOARD (Default)
+             ============================================ -->
+          <div class="tab-section active" id="tab-dashboard">
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                      />
+                      <line x1="3" y1="6" x2="21" y2="6" />
+                      <path d="M16 10a4 4 0 0 1-8 0" />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="12">0</span></div>
+                  <div class="stat-label">Total Orders</div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon is-yellow">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="12" y1="1" x2="12" y2="23" />
+                      <path
+                        d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                      />
+                    </svg>
+                  </div>
+                  <div class="stat-value">
+                    ₹<span data-count="3450">0</span>
+                  </div>
+                  <div class="stat-label">Total Spent</div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="120">0</span></div>
+                  <div class="stat-label">Reward Points</div>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <div class="stat-card">
+                  <div class="stat-icon is-yellow">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </div>
+                  <div class="stat-value"><span data-count="2">0</span></div>
+                  <div class="stat-label">Active Coupons</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Order Tracker -->
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Active Order (#ORD-7291)</h3>
+                    <span class="status-pill pending">Out for Delivery</span>
+                  </div>
+                  <p
+                    style="font-size: 13px; color: #7a6a55; margin-bottom: 20px"
+                  >
+                    Estimated arrival:
+                    <strong style="color: var(--ink)">10-15 mins</strong>.
+                  </p>
+
+                  <div class="tracker-steps">
+                    <div class="tracker-progress" style="width: 60%"></div>
+                    <!-- Dynamic width based on progress -->
+                    <div class="step completed">
+                      <div class="step-dot">✓</div>
+                      <div class="step-label">Placed</div>
+                    </div>
+                    <div class="step completed">
+                      <div class="step-dot">✓</div>
+                      <div class="step-label">Preparing</div>
+                    </div>
+                    <div class="step active">
+                      <div class="step-dot">3</div>
+                      <div class="step-label">Out for<br />Delivery</div>
+                    </div>
+                    <div class="step">
+                      <div class="step-dot">4</div>
+                      <div class="step-label">Delivered</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Orders & Quick Actions -->
+            <div class="row g-3">
+              <div class="col-12 col-lg-7">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Recent Orders</h3>
+                    <a
+                      href="#"
+                      class="switch-tab"
+                      data-target="orders"
+                      style="
+                        font-size: 12px;
+                        font-weight: 700;
+                        color: var(--tomato);
+                        text-decoration: none;
+                      "
+                      >View All</a
+                    >
+                  </div>
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Order ID</th>
+                          <th>Date</th>
+                          <th>Total</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>#ORD-7289</strong></td>
+                          <td>Yesterday</td>
+                          <td>₹2,100</td>
+                          <td>
+                            <span class="status-pill resolved">Delivered</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><strong>#ORD-7288</strong></td>
+                          <td>05 Nov 2025</td>
+                          <td>₹549</td>
+                          <td>
+                            <span class="status-pill resolved">Delivered</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td><strong>#ORD-7280</strong></td>
+                          <td>28 Oct 2025</td>
+                          <td>₹860</td>
+                          <td>
+                            <span class="status-pill resolved">Delivered</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-5">
+                <div
+                  class="content-card d-flex flex-column justify-content-center align-items-center text-center h-100"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #fffdf7 0%,
+                      #fff8ec 100%
+                    );
+                  "
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&q=80"
+                    alt="Pizza"
+                    style="
+                      width: 120px;
+                      height: 120px;
+                      border-radius: 50%;
+                      object-fit: cover;
+                      margin-bottom: 16px;
+                      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                    "
+                  />
+                  <h3
+                    class="chart-title"
+                    style="font-size: 18px; margin-bottom: 8px"
+                  >
+                    Hungry again?
+                  </h3>
+                  <p
+                    style="
+                      font-size: 13px;
+                      color: #7a6a55;
+                      margin-bottom: 20px;
+                      max-width: 250px;
+                    "
+                  >
+                    Your favorite Margherita is just a click away.
+                  </p>
+                  <a
+                    href="./404.html"
+                    class="btn-primary-custom w-100"
+                    style="max-width: 200px"
+                    >Order Now</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Dashboard -->
+
+          <!-- ============================================
+             TAB: MY ORDERS
+             ============================================ -->
+          <div class="tab-section" id="tab-orders">
+            <div class="content-card">
+              <div class="chart-header">
+                <h3 class="chart-title">All My Orders</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Items</th>
+                      <th>Date</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>#ORD-7291</strong></td>
+                      <td>1x Margherita, 1x Coke</td>
+                      <td>Today, 10:42 AM</td>
+                      <td>₹340</td>
+                      <td>
+                        <span class="status-pill pending"
+                          >Out for Delivery</span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-light"
+                          style="
+                            border: 1px solid #ddd;
+                            font-size: 11px;
+                            font-weight: 700;
+                          "
+                          onclick="window.location.href = './404.html'"
+                        >
+                          Track
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7289</strong></td>
+                      <td>2x Meat Lovers, 1x Garlic Bread</td>
+                      <td>Yesterday, 08:30 PM</td>
+                      <td>₹2,100</td>
+                      <td>
+                        <span class="status-pill resolved">Delivered</span>
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-light"
+                          style="
+                            border: 1px solid #ddd;
+                            font-size: 11px;
+                            font-weight: 700;
+                          "
+                          onclick="window.location.href = './404.html'"
+                        >
+                          Reorder
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7288</strong></td>
+                      <td>1x Paneer Tikka</td>
+                      <td>05 Nov 2025</td>
+                      <td>₹549</td>
+                      <td>
+                        <span class="status-pill resolved">Delivered</span>
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-light"
+                          style="
+                            border: 1px solid #ddd;
+                            font-size: 11px;
+                            font-weight: 700;
+                          "
+                          onclick="window.location.href = './404.html'"
+                        >
+                          Reorder
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>#ORD-7280</strong></td>
+                      <td>3x Veggie Supreme</td>
+                      <td>28 Oct 2025</td>
+                      <td>₹860</td>
+                      <td>
+                        <span class="status-pill resolved">Delivered</span>
+                      </td>
+                      <td>
+                        <button
+                          class="btn btn-sm btn-light"
+                          style="
+                            border: 1px solid #ddd;
+                            font-size: 11px;
+                            font-weight: 700;
+                          "
+                          onclick="window.location.href = './404.html'"
+                        >
+                          Reorder
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Orders -->
+
+          <!-- ============================================
+             TAB: FAVORITES
+             ============================================ -->
+          <div class="tab-section" id="tab-favorites">
+            <div class="chart-header">
+              <h3 class="chart-title">Your Favorite Pizzas</h3>
+            </div>
+            <div class="row g-3">
+              <!-- Item 1 -->
+              <div class="col-6 col-md-4 col-lg-3">
+                <div class="fav-card">
+                  <img
+                    src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&q=80"
+                    alt="Margherita"
+                    class="fav-img"
+                  />
+                  <div class="fav-body">
+                    <h4 class="fav-title">Margherita</h4>
+                    <div class="fav-price">₹249</div>
+                    <button
+                      class="btn-reorder"
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Reorder
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Item 2 -->
+              <div class="col-6 col-md-4 col-lg-3">
+                <div class="fav-card">
+                  <img
+                    src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80"
+                    alt="Pepperoni"
+                    class="fav-img"
+                  />
+                  <div class="fav-body">
+                    <h4 class="fav-title">Pepperoni</h4>
+                    <div class="fav-price">₹329</div>
+                    <button
+                      class="btn-reorder"
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Reorder
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Item 3 -->
+              <div class="col-6 col-md-4 col-lg-3">
+                <div class="fav-card">
+                  <img
+                    src="https://images.unsplash.com/photo-1548369937-47519962c11a?w=400&q=80"
+                    alt="Paneer Tikka"
+                    class="fav-img"
+                  />
+                  <div class="fav-body">
+                    <h4 class="fav-title">Paneer Tikka</h4>
+                    <div class="fav-price">₹369</div>
+                    <button
+                      class="btn-reorder"
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Reorder
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Favorites -->
+
+          <!-- ============================================
+             TAB: ADDRESSES
+             ============================================ -->
+          <div class="tab-section" id="tab-addresses">
+            <div class="chart-header">
+              <h3 class="chart-title">Saved Addresses</h3>
+              <button
+                class="btn-primary-custom"
+                style="padding: 8px 16px; font-size: 12px"
+              >
+                + Add New
+              </button>
+            </div>
+            <div class="row g-3">
+              <!-- Home Address -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <div class="address-card is-default">
+                  <span class="address-badge">Default</span>
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 8px;
+                    "
+                  >
+                    Home
+                  </h4>
+                  <p
+                    style="
+                      font-size: 13px;
+                      color: #7a6a55;
+                      line-height: 1.5;
+                      margin-bottom: 16px;
+                    "
+                  >
+                    42 Marina Walk, Besant Nagar,<br />Chennai, TN 600090
+                  </p>
+                  <div style="display: flex; gap: 10px">
+                    <button
+                      class="btn btn-sm btn-light"
+                      style="border: 1px solid #ddd; font-size: 11px"
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      class="btn btn-sm btn-light"
+                      style="
+                        border: 1px solid #ddd;
+                        font-size: 11px;
+                        color: var(--tomato);
+                      "
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Work Address -->
+              <div class="col-12 col-md-6 col-lg-4">
+                <div class="address-card">
+                  <h4
+                    style="
+                      font-family: &quot;Bricolage Grotesque&quot;;
+                      font-weight: 800;
+                      font-size: 15px;
+                      margin: 0 0 8px;
+                    "
+                  >
+                    Work
+                  </h4>
+                  <p
+                    style="
+                      font-size: 13px;
+                      color: #7a6a55;
+                      line-height: 1.5;
+                      margin-bottom: 16px;
+                    "
+                  >
+                    123 Tech Park, OMR Road,<br />Chennai, TN 600096
+                  </p>
+                  <div style="display: flex; gap: 10px">
+                    <button
+                      class="btn btn-sm btn-light"
+                      style="border: 1px solid #ddd; font-size: 11px"
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      class="btn btn-sm btn-light"
+                      style="
+                        border: 1px solid #ddd;
+                        font-size: 11px;
+                        color: var(--tomato);
+                      "
+                      onclick="window.location.href = './404.html'"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Addresses -->
+
+          <!-- ============================================
+             TAB: SUPPORT
+             ============================================ -->
+          <div class="tab-section" id="tab-support">
+            <div class="row g-3">
+              <div class="col-12 col-lg-7">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">My Support Tickets</h3>
+                  </div>
+                  <!-- Ticket 1 -->
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      padding: 16px 0;
+                      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                    "
+                  >
+                    <div
+                      style="
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 50%;
+                        background: rgba(197, 23, 46, 0.1);
+                        color: #c5172e;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 800;
+                      "
+                    >
+                      !
+                    </div>
+                    <div style="flex: 1">
+                      <h4
+                        style="
+                          font-family: &quot;Bricolage Grotesque&quot;;
+                          font-weight: 800;
+                          font-size: 15px;
+                          margin: 0 0 4px;
+                        "
+                      >
+                        Order #ORD-7291 Delayed
+                      </h4>
+                      <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                        I've been waiting for 40 minutes.
+                      </p>
+                    </div>
+                    <div style="text-align: right">
+                      <span
+                        style="
+                          font-size: 11px;
+                          color: #a89a85;
+                          display: block;
+                          margin-bottom: 6px;
+                        "
+                        >2m ago</span
+                      >
+                      <span class="status-pill pending">Open</span>
+                    </div>
+                  </div>
+                  <!-- Ticket 2 -->
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 16px;
+                      padding: 16px 0;
+                      border-bottom: none;
+                    "
+                  >
+                    <div
+                      style="
+                        width: 48px;
+                        height: 48px;
+                        border-radius: 50%;
+                        background: rgba(30, 142, 62, 0.1);
+                        color: #1e8e3e;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 800;
+                      "
+                    >
+                      ✓
+                    </div>
+                    <div style="flex: 1">
+                      <h4
+                        style="
+                          font-family: &quot;Bricolage Grotesque&quot;;
+                          font-weight: 800;
+                          font-size: 15px;
+                          margin: 0 0 4px;
+                        "
+                      >
+                        Wrong Pizza Delivered
+                      </h4>
+                      <p style="font-size: 13px; color: #7a6a55; margin: 0">
+                        Received Pepperoni instead of Margherita.
+                      </p>
+                    </div>
+                    <div style="text-align: right">
+                      <span
+                        style="
+                          font-size: 11px;
+                          color: #a89a85;
+                          display: block;
+                          margin-bottom: 6px;
+                        "
+                        >2 days ago</span
+                      >
+                      <span class="status-pill resolved">Resolved</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-5">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Raise a New Ticket</h3>
+                  </div>
+                  <form
+                    onsubmit="
+                      event.preventDefault();
+                      alert('Ticket submitted successfully!');
+                    "
+                  >
+                    <div class="mb-3">
+                      <label class="form-label">Subject</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="e.g. Missing item in order"
+                        required
+                      />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Message</label>
+                      <textarea
+                        class="form-control"
+                        rows="4"
+                        placeholder="Describe your issue..."
+                        required
+                      ></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary-custom w-100">
+                      Submit Ticket
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Support -->
+
+          <!-- ============================================
+             TAB: PROFILE
+             ============================================ -->
+          <div class="tab-section" id="tab-profile">
+            <div class="row g-3">
+              <div class="col-12 col-lg-4">
+                <div class="content-card text-center">
+                  <div
+                    class="profile-avatar-large mx-auto"
+                    id="profileInitials"
+                  >
+                    U
+                  </div>
+                  <h3
+                    class="chart-title"
+                    id="profileName"
+                    style="font-size: 20px"
+                  >
+                    User Name
+                  </h3>
+                  <p
+                    style="font-size: 13px; color: #7a6a55; margin-bottom: 16px"
+                    id="profileEmail"
+                  >
+                    user@example.com
+                  </p>
+                  <span class="status-pill active">Member</span>
+
+                  <hr style="margin: 24px 0; border-color: var(--border)" />
+                  <p style="font-size: 13px; color: #7a6a55">
+                    Joined: <strong>12 Oct 2025</strong>
+                  </p>
+                </div>
+              </div>
+              <div class="col-12 col-lg-8">
+                <div class="content-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Edit Profile</h3>
+                  </div>
+                  <form
+                    onsubmit="
+                      event.preventDefault();
+                      alert('Profile updated successfully!');
+                    "
+                  >
+                    <div class="row g-3 mb-3">
+                      <div class="col-12 col-md-6">
+                        <label class="form-label">Full Name</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="inputName"
+                          value="User Name"
+                        />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label">Email Address</label>
+                        <input
+                          type="email"
+                          class="form-control"
+                          id="inputEmail"
+                          value="user@example.com"
+                          disabled
+                          style="background: #f9f9f9"
+                        />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label">Phone Number</label>
+                        <input
+                          type="tel"
+                          class="form-control"
+                          value="+91 98765 43210"
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" class="btn-primary-custom mt-2">
+                      Save Changes
+                    </button>
+                  </form>
+
+                  <hr style="margin: 32px 0; border-color: var(--border)" />
+
+                  <div class="chart-header">
+                    <h3 class="chart-title">Change Password</h3>
+                  </div>
+                  <form
+                    onsubmit="
+                      event.preventDefault();
+                      alert('Password changed successfully!');
+                    "
+                  >
+                    <div class="row g-3 mb-3">
+                      <div class="col-12">
+                        <label class="form-label">Current Password</label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label">New Password</label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="form-label">Confirm Password</label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      class="btn btn-outline-danger"
+                      style="
+                        font-weight: 700;
+                        font-size: 13px;
+                        border-radius: 10px;
+                        padding: 10px 24px;
+                      "
+                    >
+                      Update Password
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Tab: Profile -->
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+      /* ============================================================
+       1. AUTH GUARD & INIT
+       ============================================================ */
+      const STORAGE_KEY = "stackly_user";
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      } catch (_) {}
+
+      if (!user || !user.email) {
+        window.location.href = "./login.html";
+      } else {
+        // Populate user data
+        const displayName = user.name || "Friend";
+        document.getElementById("userName").textContent = displayName;
+
+        // Populate Profile Tab
+        document.getElementById("profileName").textContent = displayName;
+        document.getElementById("profileEmail").textContent = user.email;
+        document.getElementById("inputName").value = displayName;
+        document.getElementById("inputEmail").value = user.email;
+
+        // Initials for avatar
+        const initials = displayName
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+        document.getElementById("profileInitials").textContent =
+          initials || "U";
+      }
+
+      /* ============================================================
+       2. LOGOUT
+       ============================================================ */
+      function handleLogout() {
+        localStorage.removeItem(STORAGE_KEY);
+        window.location.href = "./login.html";
+      }
+      document
+        .getElementById("sidebarLogout")
+        .addEventListener("click", handleLogout);
+
+      /* ============================================================
+       3. SIDEBAR TOGGLE & TAB SWITCHING
+       ============================================================ */
+      (function initNavigation() {
+        const hamburgerBtn = document.getElementById("hamburgerBtn");
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        const navItems = document.querySelectorAll(".nav-item[data-target]");
+        const tabSections = document.querySelectorAll(".tab-section");
+        const pageTitleEl = document.getElementById("pageTitle");
+
+        // Mobile Sidebar
+        function openSidebar() {
+          sidebar.classList.add("is-open");
+          backdrop.classList.add("is-visible");
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeSidebar() {
+          sidebar.classList.remove("is-open");
+          backdrop.classList.remove("is-visible");
+          document.body.style.overflow = "";
+        }
+
+        hamburgerBtn.addEventListener("click", openSidebar);
+        backdrop.addEventListener("click", closeSidebar);
+
+        // Tab Switching Logic
+        function switchTab(targetId) {
+          // 1. Hide all tabs
+          tabSections.forEach((tab) => tab.classList.remove("active"));
+
+          // 2. Show selected tab
+          const activeTab = document.getElementById(`tab-${targetId}`);
+          if (activeTab) activeTab.classList.add("active");
+
+          // 3. Update sidebar active state
+          navItems.forEach((item) => {
+            if (item.dataset.target === targetId) {
+              item.classList.add("active");
+            } else {
+              item.classList.remove("active");
+            }
+          });
+
+          // 4. Update Hero Title
+          const titles = {
+            dashboard: "My <span>Dashboard</span>",
+            orders: "My <span>Orders</span>",
+            favorites: "My <span>Favorites</span>",
+            addresses: "Saved <span>Addresses</span>",
+            support: "Support <span>Tickets</span>",
+            profile: "My <span>Profile</span>",
+          };
+          pageTitleEl.innerHTML =
+            titles[targetId] || "My <span>Dashboard</span>";
+
+          // 5. Close mobile menu if open
+          closeSidebar();
+
+          // 6. Refresh AOS
+          if (typeof AOS !== "undefined") setTimeout(() => AOS.refresh(), 100);
+        }
+
+        // Attach click events to sidebar
+        navItems.forEach((item) => {
+          item.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchTab(item.dataset.target);
+          });
+        });
+
+        // Attach click events to "View All" buttons
+        document.querySelectorAll(".switch-tab").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchTab(link.dataset.target);
+          });
+        });
+      })();
+
+      /* ============================================================
+       4. AOS ANIMATIONS
+       ============================================================ */
+      AOS.init({
+        duration: 700,
+        easing: "ease-out-cubic",
+        once: true,
+        offset: 50,
+        disable: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      });
+
+      /* ============================================================
+       5. GSAP COUNTERS
+       ============================================================ */
+      (function initCounters() {
+        const reduceMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        if (reduceMotion) return;
+
+        const items = document.querySelectorAll("[data-count]");
+        items.forEach((el) => {
+          const target = parseInt(el.dataset.count, 10) || 0;
+          const obj = { val: 0 };
+
+          gsap.to(obj, {
+            val: target,
+            duration: 2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: el,
+              start: "top 90%",
+              once: true,
+            },
+            onUpdate: () => {
+              el.textContent = Math.round(obj.val).toLocaleString("en-IN");
+            },
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
